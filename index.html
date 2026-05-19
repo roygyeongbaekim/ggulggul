@@ -13,7 +13,7 @@
     <section class="screen intro active" id="introScreen">
       <div class="panel intro-card">
         <div class="intro-bg-coins"><span class="bg-coin" style="left:6%; bottom:-24px; animation-delay:0s; animation-duration:7.2s"></span><span class="bg-coin" style="left:21%; bottom:-42px; animation-delay:1.2s; animation-duration:6.3s"></span><span class="bg-coin" style="left:39%; bottom:-30px; animation-delay:.6s; animation-duration:8.2s"></span><span class="bg-coin" style="left:63%; bottom:-38px; animation-delay:2s; animation-duration:7.6s"></span><span class="bg-coin" style="left:79%; bottom:-26px; animation-delay:1.5s; animation-duration:6.9s"></span><span class="bg-coin" style="left:90%; bottom:-34px; animation-delay:2.5s; animation-duration:8.4s"></span></div>
-        <img src="pigbank-clean333.jpg" alt="꿀꿀 저축챌린지 돼지저금통" class="intro-pigbank-img">
+        <img src="pigbank.jpg" alt="꿀꿀 저축챌린지 돼지저금통" class="intro-pigbank-img">
         <h1 class="title">꿀꿀 저축챌린지<span class="sparkle s1"></span><span class="sparkle s2"></span><span class="sparkle s3"></span></h1>
         <p class="subtitle">하루 200번의 클릭으로 최대한 많이 저축하세요! 업그레이드와 콤보로 클릭 효율을 극대화하세요.</p>
         <div style="display:grid;gap:12px;margin-top:22px;justify-items:center">
@@ -40,12 +40,18 @@
               <div style="font-size:1.55rem;font-weight:900;color:#7b2845;line-height:1" id="score">0</div>
             </div>
           </div>
-          <div style="text-align:right">
-            <div style="font-size:.75rem;color:var(--muted);font-weight:700">콤보</div>
-            <div style="font-size:1.3rem;font-weight:900;color:#e86c00" id="comboDisplay">×1.0</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <button id="tipIconBtn" title="오늘의 금융 팁" style="position:relative;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#fff3c4,#ffe066);border:1.5px solid rgba(200,155,0,.3);font-size:1.3rem;display:grid;place-items:center;box-shadow:0 2px 6px rgba(200,150,0,.15);cursor:pointer;flex-shrink:0;transition:background .25s,opacity .25s">
+              <span id="tipIconEmoji">💡</span>
+              <span id="tipDotIndicator" style="display:none;position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#e53e3e;border:1.5px solid #fff"></span>
+            </button>
+            <div style="text-align:right">
+              <div style="font-size:.75rem;color:var(--muted);font-weight:700">콤보</div>
+              <div style="font-size:1.3rem;font-weight:900;color:#e86c00" id="comboDisplay">×1.0</div>
+            </div>
           </div>
         </div>
-        <div class="money"><div style="color:var(--muted);font-size:.95rem">오늘의 저축</div><div class="value" id="money">₩0</div><div class="meta"><span>클릭 수익 <strong id="clickIncome">₩10</strong></span></div></div>
+        <div class="money"><div style="display:flex;align-items:center;justify-content:center;gap:5px;color:var(--muted);font-size:.82rem;font-weight:700;margin-bottom:2px"><span>💰</span><span>오늘의 저축</span></div><div class="value" id="money">₩0</div><div class="meta"><span>클릭 수익 <strong id="clickIncome" style="color:#e86c00">₩10</strong></span></div></div>
         <div class="tap-area">
           <div class="tap-wrap">
             <button class="tap-button" id="earnBtn" aria-label="돼지저금통 클릭 버튼">
@@ -58,18 +64,18 @@
               <span class="piggy-mouth" id="piggyMouth" aria-hidden="true"></span>
               <span class="tap-title"></span><span class="tap-sub"></span>
             </button>
-            <div id="clickLimitWrap" style="margin-top:12px;width:min(230px,72vw);text-align:center">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-                <span style="font-size:.78rem;color:var(--muted);font-weight:700"></span>
+            <div id="clickLimitWrap" style="margin-top:12px;width:min(190px,60vw);text-align:center">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="font-size:.75rem;color:var(--muted);font-weight:700">🐾 클릭 현황</span>
                 <span id="clickLimitText" style="font-size:.78rem;font-weight:800;color:#7b2845">0 / 200</span>
               </div>
-              <div style="height:7px;border-radius:999px;background:rgba(0,0,0,.07);overflow:hidden">
+              <div style="height:9px;border-radius:999px;background:rgba(0,0,0,.07);overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.08)">
                 <div id="clickLimitBar" style="height:100%;border-radius:999px;background:linear-gradient(90deg,#ff9dbf,#eb789b);transition:width .3s ease;width:0%"></div>
               </div>
               <div id="clickCountdown" style="display:none;margin-top:8px;font-size:.82rem;font-weight:800;color:#e53e3e;padding:5px 12px;background:var(--surface2);border-radius:999px"></div>
             </div>
             <!-- 오늘 챌린지 완료 결과 카드 -->
-            <div id="dailyCompleteCard" style="display:none;margin-top:16px;width:min(230px,72vw);padding:16px;background:linear-gradient(135deg,#fff0f6 0%,#ffe8f2 100%);border-radius:20px;border:1.5px solid rgba(235,120,155,.35);text-align:center">
+            <div id="dailyCompleteCard" style="display:none;margin-top:16px;width:min(190px,60vw);padding:16px;background:linear-gradient(135deg,#fff0f6 0%,#ffe8f2 100%);border-radius:20px;border:1.5px solid rgba(235,120,155,.35);text-align:center">
               <div style="font-size:2.2rem;line-height:1.2">🎊</div>
               <div style="font-weight:900;font-size:1.05rem;color:#7b2845;margin:6px 0 2px">오늘 챌린지 완료!</div>
               <div style="font-size:.82rem;color:var(--muted);margin-bottom:12px">200번의 클릭을 모두 사용했어요</div>
@@ -91,20 +97,10 @@
               <div id="resultSavedMsg" style="display:none;margin-top:8px;font-size:.8rem;color:var(--success);font-weight:700">✅ 랭킹에 저장됐어요!</div>
             </div>
           </div>
-          <section class="quick"><div class="up-list" id="quickUpgradeList"></div></section>
+          <section class="quick"><div class="quick-header">⚡ 빠른 업그레이드</div><div class="up-list" id="quickUpgradeList"></div></section>
         </div>
         
         <section class="panel" style="margin-top:14px;padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><h3 style="margin:0">실시간 랭킹</h3><button class="small-btn" id="saveScoreBtn">현재 점수 저장</button></div><div id="rankingBoard" style="display:grid;gap:8px"></div></section>
-
-        <!-- 오늘의 금융 팁 -->
-        <div class="panel" id="dailyTipCard" style="margin-top:14px;padding:16px;background:linear-gradient(135deg,#fffbef 0%,#fff7e6 100%);border-color:rgba(255,200,50,.3)">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px">
-            <strong style="color:#7b5a00;font-size:.95rem">💡 오늘의 금융 팁</strong>
-            <span id="dailyTipTag" style="padding:3px 10px;border-radius:999px;background:rgba(255,215,107,.4);color:#7b5a00;font-size:.78rem;font-weight:700"></span>
-          </div>
-          <p id="dailyTipText" style="margin:0 0 12px;color:#5a4500;font-size:.9rem;line-height:1.65;min-height:2.5em"></p>
-          <button id="tipClaimBtn" class="tip-claim-btn">📖 읽기 완료 보너스 받기 (+₩300)</button>
-        </div>
 
         <!-- 오늘의 목표 -->
         <div class="panel" id="dailyGoalsCard" style="margin-top:14px;padding:16px">
@@ -117,6 +113,19 @@
 
       </section>
     </section>
+  </div>
+
+  <!-- 오늘의 금융 팁 모달 -->
+  <div class="modalbg" id="tipModal" style="z-index:1050">
+    <div class="modal" style="max-width:380px;gap:14px;background:linear-gradient(160deg,#fffdf0,#fff8dc)">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <strong style="color:#7b5a00;font-size:1rem">💡 오늘의 금융 팁</strong>
+        <span id="dailyTipTag" style="padding:3px 10px;border-radius:999px;background:rgba(255,215,107,.45);color:#7b5a00;font-size:.78rem;font-weight:700"></span>
+      </div>
+      <p id="dailyTipText" style="margin:0;color:#5a4500;font-size:.93rem;line-height:1.7;"></p>
+      <button id="tipClaimBtn" class="tip-claim-btn" style="width:100%;min-height:44px">📖 읽기 완료 보너스 받기 (+₩300)</button>
+      <button id="tipModalClose" style="min-height:40px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);font-weight:700;font-size:.9rem;color:var(--muted)">닫기</button>
+    </div>
   </div>
 
   <!-- 퀴즈 봉투 알림 애니메이션 -->
@@ -223,7 +232,7 @@
     const rankingKey = 'ggul-saving-ranking-v1';
     function loadRanking(){ try { return JSON.parse(localStorage.getItem(rankingKey) || '[]'); } catch(e){ return []; } }
     function saveRanking(list){ localStorage.setItem(rankingKey, JSON.stringify(list)); }
-    function upsertRanking(){ const list = loadRanking(); const entry = { name: (state.playerName || '플레이어').trim() || '플레이어', score: state.score, money: state.money, savedAt: new Date().toISOString() }; list.push(entry); list.sort((a,b)=> (b.score-a.score) || (b.money-a.money)); const trimmed = list.slice(0,5); saveRanking(trimmed); renderRanking(); showToast('랭킹에 현재 기록을 저장했어요.'); }
+    function upsertRanking(){ const list = loadRanking(); const entry = { name: (state.playerName || '플레이어').trim() || '플레이어', score: state.score, money: state.money, savedAt: new Date().toISOString() }; list.push(entry); list.sort((a,b)=> (b.score-a.score) || (b.money-a.money)); const trimmed = list.slice(0,5); saveRanking(trimmed); renderRanking(); showToast('꿀꿀~ 랭킹에 저장했어요! 🐷'); }
     function renderRanking(){
       const list = loadRanking();
       const me = (state.playerName||'').trim();
@@ -266,6 +275,8 @@
       return { ok:true };
     }
     playerNameInput.oninput = () => clearNameError();
+    $('#introScreen').addEventListener('touchstart', e => { if(e.target !== playerNameInput) playerNameInput.blur(); }, { passive: true });
+    $('#introScreen').addEventListener('mousedown', e => { if(e.target !== playerNameInput) playerNameInput.blur(); });
     $('#startBtn').onclick=()=>{
       const name = (playerNameInput?.value || '').trim();
       const result = validatePlayerName(name);
@@ -283,9 +294,9 @@
     const UPGRADE_MAX_COUNT = 5;
     function buyUpgrade(index){
       const item = state.upgrades[index];
-      if(state.dailyData && state.dailyData.dailyClicks >= DAILY_CLICK_LIMIT){ showToast('오늘 클릭 횟수를 모두 사용했어요! 내일 다시 도전하세요 🌙'); return; }
-      if(item.bought >= UPGRADE_MAX_COUNT){ showToast(`${item.name}은 더 이상 사용할 수 없어요!`); return; }
-      if(state.money < item.cost){ showToast('저축이 부족합니다. 조금 더 모아보세요.'); return; }
+      if(state.dailyData && state.dailyData.dailyClicks >= DAILY_CLICK_LIMIT){ showToast('꿀꿀... 오늘 클릭을 다 썼어요! 내일 또 봐요 🌙'); return; }
+      if(item.bought >= UPGRADE_MAX_COUNT){ showToast(`꿀꿀~ ${item.name}은 더 이상 못해요! 🐷`); return; }
+      if(state.money < item.cost){ showToast('꿀꿀... 저축이 부족해요! 더 모아봐요 🐷'); return; }
       state.money -= item.cost;
       state.upgradeCount += 1;
       state.score += 15;
@@ -296,15 +307,15 @@
         if(win){
           state.clickIncome += item.value;
           changePiggyMood('happy');
-          showToast(`📈 ${item.name} 대박! 클릭 수익 +₩${item.value} (${item.bought}/${UPGRADE_MAX_COUNT}회)`);
+          showToast(`꿀꿀! 📈 대박났어요! 수익 +₩${item.value} (${item.bought}/${UPGRADE_MAX_COUNT}회)`);
         } else {
           state.clickIncome = Math.max(10, state.clickIncome - item.value);
           changePiggyMood('sad');
-          showToast(`📉 ${item.name} 손실... 클릭 수익 -₩${item.value} (${item.bought}/${UPGRADE_MAX_COUNT}회)`);
+          showToast(`꿀꿀... 📉 손실났어요ㅠ 수익 -₩${item.value} (${item.bought}/${UPGRADE_MAX_COUNT}회)`);
         }
       } else {
         state.clickIncome += item.value;
-        showToast(`${item.name} 완료! 클릭 수익 +₩${item.value} (${item.bought}/${UPGRADE_MAX_COUNT}회)`);
+        showToast(`꿀꿀~ ${item.name} 완료! 수익 +₩${item.value} 🐷`);
       }
       triggerCoinAnimations(); updateUI(); triggerEventIfMet(); updateGoalProgress('upgrade',1); savePlayerState();
     }
@@ -320,14 +331,12 @@
         btn.className = 'up' + (maxed ? ' maxed' : clickOver ? ' maxed' : isRisky ? ' risky' + (canAfford ? ' aff' : '') : canAfford ? ' aff' : '');
         btn.disabled = maxed || clickOver;
         btn.innerHTML = `
-          <span class="icon">${item.icon}</span>
-          <span class="up-body">
-            <div class="up-name">${item.name}${isRisky ? ' <span class="risk-tag">위험</span>' : ''}</div>
-            <div class="up-desc">${item.desc}</div>
-            <div class="up-bar-wrap"><div class="up-bar-fill" style="width:${pct}%"></div></div>
-            <div class="up-count">${maxed ? '🔒 한도 도달' : `${item.bought} / ${UPGRADE_MAX_COUNT}회 사용`}</div>
-          </span>
-          <span class="buy">${maxed ? '<span class="cost up-maxed-label">완료</span>' : `<span class="cost">${formatMoney(item.cost)}</span>`}</span>`;
+          <div class="up-icon">${item.icon}</div>
+          <div class="up-name">${item.name}${isRisky ? ' <span class="risk-tag">위험</span>' : ''}</div>
+          <div class="up-desc">${item.desc}</div>
+          <div class="up-bar-wrap"><div class="up-bar-fill" style="width:${pct}%"></div></div>
+          <div class="up-count">${maxed ? '🔒 완료' : `${item.bought}/${UPGRADE_MAX_COUNT}회`}</div>
+          <div class="up-cost">${maxed ? '—' : formatMoney(item.cost)}</div>`;
         btn.onclick = () => buyUpgrade(index);
         quickUpgradeList.appendChild(btn);
       });
@@ -349,7 +358,7 @@
         const modal=$('#eventModal'); const title=$('#eventModalTitle'); const question=$('#eventModalQuestion'); const options=$('#eventModalOptions');
         const labels={easy:'기초 · 비상금/예적금',normal:'일반 · 카드/대출',hard:'심화 · 투자/세금'};
         modal.style.display='flex'; title.textContent=`${quiz.title} [${labels[roundKey]||roundKey}]`; question.textContent=quiz.question; options.innerHTML='';
-        quiz.options.forEach((opt,idx)=>{ const btn=document.createElement('button'); btn.className='qbtn'; btn.textContent=opt; btn.onclick=()=>{ const correct=idx===quiz.answer; if(correct){ state.money+=quiz.bonus; state.score+=10; changePiggyMood('happy'); updateGoalProgress('quizCorrect',1); showToast(`정답! ₩${quiz.bonus} 보너스 지급`);} else { changePiggyMood('sad'); showToast('아쉽지만 오답입니다'); } updateUI(); closeEventModal(); state.completedRounds[roundKey]=true; const next=roundLevels[roundKey]?.next; state.currentRound=next||null; state.roundTriggered=false; }; options.appendChild(btn); });
+        quiz.options.forEach((opt,idx)=>{ const btn=document.createElement('button'); btn.className='qbtn'; btn.textContent=opt; btn.onclick=()=>{ const correct=idx===quiz.answer; if(correct){ state.money+=quiz.bonus; state.score+=10; changePiggyMood('happy'); updateGoalProgress('quizCorrect',1); showToast(`꿀꿀! 정답이에요~ +₩${quiz.bonus} 🎉`);} else { changePiggyMood('sad'); showToast('꿀꿀... 틀렸어요ㅠ 다음엔 맞춰요 🐷'); } updateUI(); closeEventModal(); state.completedRounds[roundKey]=true; const next=roundLevels[roundKey]?.next; state.currentRound=next||null; state.roundTriggered=false; }; options.appendChild(btn); });
       }, 1700);
     }
     function closeEventModal(){ $('#eventModal').style.display='none'; }
@@ -390,7 +399,7 @@
       showEventModal(quiz,roundKey);
     }
     function updateUI(){ moneyEl.textContent=formatMoney(state.money); clickIncomeEl.textContent=formatMoney(state.clickIncome); if(comboDisplayEl){ const cm=state.comboMult||1; comboDisplayEl.textContent='×'+cm.toFixed(1); comboDisplayEl.style.color=cm>=2.5?'#d43000':cm>=1.5?'#e86c00':'#7b2845'; } scoreEl.textContent=state.score.toLocaleString('ko-KR'); renderQuickUpgrades(); checkAbsoluteGoals(); }
-    earnBtn.onclick=()=>{ if(state.dailyData && state.dailyData.dailyClicks >= DAILY_CLICK_LIMIT){ showToast('오늘 클릭 횟수를 모두 사용했어요! 내일 다시 도전하세요 🌙'); return; } state.combo=Math.min((state.combo||0)+1,10); state.comboMult=parseFloat((1+(state.combo-1)*0.25).toFixed(2)); if(state.combo>=(state.bestCombo||1)) state.bestCombo=state.combo; clearTimeout(state.comboTimer); state.comboTimer=setTimeout(()=>{ state.combo=0; state.comboMult=1; if(comboDisplayEl){comboDisplayEl.textContent='×1.0';comboDisplayEl.style.color='#7b2845';} },1800); const earned=Math.floor(state.clickIncome*state.comboMult); state.money+=earned; state.tapCount+=1; state.score+=1; if(state.dailyData){ state.dailyData.dailyClicks=(state.dailyData.dailyClicks||0)+1; saveDailyData(state.dailyData); } earnBtn.classList.remove('popped'); void earnBtn.offsetWidth; earnBtn.classList.add('popped'); triggerCoinAnimations(); updateUI(); triggerEventIfMet(); updateGoalProgress('tap',1); const justFinished=state.dailyData&&state.dailyData.dailyClicks>=DAILY_CLICK_LIMIT&&!state._completeCelebrated; if(justFinished){ state._completeCelebrated=true; setTimeout(()=>{ launchConfetti(); showToast('🎊 200번 달성! 오늘 챌린지 완료!'); },300); } renderClickLimit(); };
+    earnBtn.onclick=()=>{ if(state.dailyData && state.dailyData.dailyClicks >= DAILY_CLICK_LIMIT){ showToast('꿀꿀... 오늘 클릭을 다 썼어요! 내일 또 봐요 🌙'); return; } state.combo=Math.min((state.combo||0)+1,10); state.comboMult=parseFloat((1+(state.combo-1)*0.25).toFixed(2)); if(state.combo>=(state.bestCombo||1)) state.bestCombo=state.combo; clearTimeout(state.comboTimer); state.comboTimer=setTimeout(()=>{ state.combo=0; state.comboMult=1; if(comboDisplayEl){comboDisplayEl.textContent='×1.0';comboDisplayEl.style.color='#7b2845';} },1800); const earned=Math.floor(state.clickIncome*state.comboMult); state.money+=earned; state.tapCount+=1; state.score+=1; if(state.dailyData){ state.dailyData.dailyClicks=(state.dailyData.dailyClicks||0)+1; saveDailyData(state.dailyData); } earnBtn.classList.remove('popped'); void earnBtn.offsetWidth; earnBtn.classList.add('popped'); triggerCoinAnimations(); updateUI(); triggerEventIfMet(); updateGoalProgress('tap',1); const justFinished=state.dailyData&&state.dailyData.dailyClicks>=DAILY_CLICK_LIMIT&&!state._completeCelebrated; if(justFinished){ state._completeCelebrated=true; setTimeout(()=>{ launchConfetti(); showToast('꿀꿀꿀! 200번 달성했어요! 최고예요 🎊🐷'); },300); } renderClickLimit(); };
     loadQuizData().then(()=>{ updateUI(); renderRanking(); });
 
     // ===== 플레이어 상태 저장 =====
@@ -413,7 +422,17 @@
       };
       localStorage.setItem(getPlayerStateKey(), JSON.stringify(ps));
     }
+    const UPGRADE_INIT = { coffee:{cost:80}, ledger:{cost:200}, study:{cost:480}, deposit:{cost:1100}, sidejob:{cost:2800}, fund:{cost:7000} };
+    function resetUpgrades(){
+      state.upgrades.forEach(u => { u.bought = 0; u.cost = UPGRADE_INIT[u.id]?.cost ?? u.cost; });
+    }
     function restorePlayerState(){
+      resetUpgrades();
+      state.money = 0; state.clickIncome = 10; state.tapCount = 0; state.upgradeCount = 0;
+      state.score = 0; state.bestCombo = 0; state.currentRound = 'easy';
+      state.completedRounds = { easy:false, normal:false, hard:false };
+      state.usedQuizIndices = { easy:[], normal:[], hard:[] };
+      state.rankingSavedDate = null; state.playerId = null;
       try {
         const ps = JSON.parse(localStorage.getItem(getPlayerStateKey()) || 'null');
         if(!ps) return;
@@ -500,7 +519,7 @@
       if(scoreBtn){ scoreBtn.disabled = saved; scoreBtn.style.opacity = saved ? '0.5' : ''; scoreBtn.textContent = saved ? '✅ 저장됨' : '현재 점수 저장'; }
     }
     function doSaveRanking(){
-      if(isRankingSavedToday()){ showToast('오늘은 이미 랭킹에 저장했어요!'); return; }
+      if(isRankingSavedToday()){ showToast('꿀꿀~ 오늘은 이미 저장했어요! 🐷'); return; }
       upsertRanking();
       state.rankingSavedDate = getTodayStr();
       if(state.dailyData){ state.dailyData.rankingSaved = true; saveDailyData(state.dailyData); } else { savePlayerState(); }
@@ -547,6 +566,16 @@
         data.goals = generateDailyGoals(dayIndex);
         data.goalDate = today;
         resetDailyQuizState();
+        // 매일 게임 수치 초기화
+        state.money = 0;
+        state.score = 0;
+        state.tapCount = 0;
+        state.bestCombo = 0;
+        state.clickIncome = 10;
+        state.combo = 0;
+        state.comboMult = 1;
+        resetUpgrades();
+        savePlayerState();
       } else {
         if(!data.goals || data.goals.length === 0){
           const dayIndex = Math.floor(Date.now() / 86400000);
@@ -576,12 +605,26 @@
       const tipText = document.getElementById('dailyTipText');
       const tipTag = document.getElementById('dailyTipTag');
       const tipBtn = document.getElementById('tipClaimBtn');
+      const dot = document.getElementById('tipDotIndicator');
       if(!tipText) return;
       tipText.textContent = tip.tip;
-      tipTag.textContent = tip.tag;
+      if(tipTag) tipTag.textContent = tip.tag;
       const claimed = state.dailyData?.tipClaimed;
-      tipBtn.disabled = claimed;
-      tipBtn.textContent = claimed ? '✅ 오늘 팁 보너스를 이미 받았어요' : '📖 읽기 완료 보너스 받기 (+₩300)';
+      if(tipBtn){
+        tipBtn.disabled = claimed;
+        tipBtn.textContent = claimed ? '✅ 오늘 팁 보너스를 이미 받았어요' : '📖 읽기 완료 보너스 받기 (+₩300)';
+      }
+      if(dot) dot.style.display = claimed ? 'none' : 'block';
+      const iconEmoji = document.getElementById('tipIconEmoji');
+      const iconBtn = document.getElementById('tipIconBtn');
+      if(iconEmoji) iconEmoji.textContent = claimed ? '🔦' : '💡';
+      if(iconBtn){
+        iconBtn.style.background = claimed
+          ? 'linear-gradient(135deg,#e8e8e8,#d0d0d0)'
+          : 'linear-gradient(135deg,#fff3c4,#ffe066)';
+        iconBtn.style.borderColor = claimed ? 'rgba(0,0,0,.12)' : 'rgba(200,155,0,.3)';
+        iconBtn.style.opacity = claimed ? '0.65' : '1';
+      }
     }
 
     document.getElementById('tipClaimBtn').onclick = () => {
@@ -592,7 +635,15 @@
       saveDailyData(state.dailyData);
       renderDailyTip();
       updateUI();
-      showToast('💡 오늘의 팁 읽기 완료! +₩300 보너스!');
+      showToast('꿀꿀~ 금융 팁 읽기 완료! +₩300 🐷💡');
+    };
+
+    document.getElementById('tipIconBtn').onclick = () => {
+      document.getElementById('tipModal').style.display = 'flex';
+      renderDailyTip();
+    };
+    document.getElementById('tipModalClose').onclick = () => {
+      document.getElementById('tipModal').style.display = 'none';
     };
 
     function renderDailyGoals(){
@@ -637,7 +688,7 @@
           anyDone = true;
           state.money += goal.reward;
           state.score += Math.floor(goal.reward / 10);
-          showToast('🎯 목표 달성! "' + goal.label + '" +' + formatMoney(goal.reward));
+          showToast('꿀꿀! 목표 달성! "' + goal.label + '" +' + formatMoney(goal.reward) + ' 🐷🎯');
         }
       });
       saveDailyData(state.dailyData);
@@ -660,7 +711,7 @@
           anyDone = true;
           state.money += goal.reward;
           state.score += Math.floor(goal.reward / 10);
-          showToast('🎯 목표 달성! "' + goal.label + '" +' + formatMoney(goal.reward));
+          showToast('꿀꿀! 목표 달성! "' + goal.label + '" +' + formatMoney(goal.reward) + ' 🐷🎯');
         }
       });
       if(anyDone){ saveDailyData(state.dailyData); showAllGoalsCelebration(); }
@@ -770,7 +821,7 @@
         state.score += Math.floor(bonus / 100);
         saveDailyData(state.dailyData);
         updateUI();
-        showToast('🎉 출석 보너스 +' + formatMoney(bonus) + ' 지급!');
+        showToast('꿀꿀~ 출석 보너스 +' + formatMoney(bonus) + ' 받았어요! 🐷🎉');
       };
     }
   </script>
