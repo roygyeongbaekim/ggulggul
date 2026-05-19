@@ -1,4 +1,3 @@
-# ggulguul
 # 🐷 꿀꿀 저축챌린지
 
 > 하루 200번의 클릭으로 저축 습관을 기르는 금융 클릭 게임
@@ -55,7 +54,7 @@ finance-clicker-source/
 ├── style.css           # 스타일시트
 ├── data.js             # 금융 팁 / 목표 풀 데이터
 ├── v10-full.json       # 금융 퀴즈 문제 (난이도별 12문항)
-└── pigbank-clean333.jpg # 인트로 돼지저금통 이미지
+└── pigbank-clean22.jpg # 인트로 돼지저금통 이미지
 ```
 
 ---
@@ -65,8 +64,8 @@ finance-clicker-source/
 별도 빌드 과정 없이 `index.html`을 브라우저에서 바로 열면 됩니다.
 
 ```bash
-git clone https://github.com/roygyeongbaekim/ggulguul.git
-cd ggulguul
+git clone https://github.com/{username}/finance-clicker-source.git
+cd finance-clicker-source
 open index.html   # macOS
 # 또는 브라우저에서 index.html 파일 직접 열기
 ```
