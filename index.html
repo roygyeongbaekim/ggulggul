@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>꿀꿀 저축챌린지</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260520">
 </head>
 <body>
   <div class="app">
@@ -220,7 +223,7 @@
   </script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-  <script src="data.js"></script>
+  <script src="data.js?v=20260520"></script>
   <script>
     const state = { money:0, clickIncome:10, tapCount:0, upgradeCount:0, score:0, combo:0, comboMult:1, comboTimer:null, bestCombo:0, quizData:null, currentRound:'easy', roundTriggered:false, completedRounds:{ easy:false, normal:false, hard:false }, playerName:'플레이어', dailyData:null, upgrades:[
       { id:'coffee', icon:'☕', name:'커피 대신 저축', desc:'클릭 수익 +₩8', cost:80, type:'click', value:8, bought:0 },
