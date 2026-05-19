@@ -209,6 +209,15 @@
 
   <div class="toast" id="toast"></div>
 
+  <script>
+    document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
+    let _lastTap = 0;
+    document.addEventListener('touchend', e => {
+      const now = Date.now();
+      if (now - _lastTap < 300) e.preventDefault();
+      _lastTap = now;
+    }, { passive: false });
+  </script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
   <script src="data.js"></script>
