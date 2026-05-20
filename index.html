@@ -31,7 +31,7 @@
             <button class="rank-tab" data-tab="weekly">주간</button>
             <button class="rank-tab" data-tab="monthly">월간</button>
           </div>
-          <div id="rankingPreview" style="display:grid;gap:8px"></div>
+          <div id="rankingPreview" style="display:grid;gap:8px"><div class="ranking-loading"><div class="ranking-spinner"></div><div style="font-size:.82rem;color:var(--muted);font-weight:700">랭킹 불러오는 중...</div></div></div>
         </div>
       </div>
     </section>
@@ -338,8 +338,12 @@
       });
       return Object.values(map).sort((a,b)=>(b.score-a.score)||(b.money-a.money)).slice(0,5);
     }
+    function showRankingLoading(){
+      if(rankingPreview) rankingPreview.innerHTML='<div class="ranking-loading"><div class="ranking-spinner"></div><div style="font-size:.82rem;color:var(--muted);font-weight:700">랭킹 불러오는 중...</div></div>';
+    }
     async function fetchAndCacheRanking(){
       if(!db) return;
+      showRankingLoading();
       try {
         const snap=await db.ref('ranking').orderByChild('score').limitToLast(500).get();
         const items=[];
@@ -419,14 +423,12 @@
       const isGameScreen=!!$('#gameScreen.active');
       // 게임화면 — 일일 랭킹 + 날짜
       if(rankingBoard){
-        const dailyList=_rankingCacheByTab.daily.length?_rankingCacheByTab.daily:loadRanking();
-        renderRankList(rankingBoard,dailyList,true);
+        renderRankList(rankingBoard,_rankingCacheByTab.daily,true);
 
       }
       // 인트로화면 — 탭 기반
       if(rankingPreview){
-        const tabList=_rankingCacheByTab[_activeRankTab].length?_rankingCacheByTab[_activeRankTab]:(_activeRankTab==='daily'?loadRanking():[]);
-        renderRankList(rankingPreview,tabList,false);
+        renderRankList(rankingPreview,_rankingCacheByTab[_activeRankTab],false);
       }
     }
 
