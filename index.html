@@ -327,17 +327,31 @@
 
     function getWeekStart(){ const d=new Date(); d.setDate(d.getDate()-6); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
     function getMonthPrefix(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+    // 여러 날 데이터를 플레이어별로 합산 후 Top5 반환
+    function aggregateRanking(items){
+      const map={};
+      items.forEach(i=>{
+        const key=i.playerId||i.name;
+        if(!map[key]){ map[key]={ name:i.name, playerId:i.playerId||'', score:0, money:0 }; }
+        map[key].score += (i.score||0);
+        map[key].money += (i.money||0);
+      });
+      return Object.values(map).sort((a,b)=>(b.score-a.score)||(b.money-a.money)).slice(0,5);
+    }
     async function fetchAndCacheRanking(){
       if(!db) return;
       try {
-        const snap=await db.ref('ranking').orderByChild('score').limitToLast(100).get();
+        const snap=await db.ref('ranking').orderByChild('score').limitToLast(500).get();
         const items=[];
         if(snap.exists()) snap.forEach(child=>items.push(child.val()));
         const today=getTodayStr(); const weekStart=getWeekStart(); const monthPrefix=getMonthPrefix();
         const sortFn=(a,b)=>(b.score-a.score)||(b.money-a.money);
+        // 일일: 오늘 데이터만, 점수 높은 순
         _rankingCacheByTab.daily=items.filter(i=>i.date===today).sort(sortFn).slice(0,5);
-        _rankingCacheByTab.weekly=items.filter(i=>i.date&&i.date>=weekStart).sort(sortFn).slice(0,5);
-        _rankingCacheByTab.monthly=items.filter(i=>i.date&&i.date.startsWith(monthPrefix)).sort(sortFn).slice(0,5);
+        // 주간: 이번 주(7일) 데이터 플레이어별 합산
+        _rankingCacheByTab.weekly=aggregateRanking(items.filter(i=>i.date&&i.date>=weekStart));
+        // 월간: 이번 달 데이터 플레이어별 합산
+        _rankingCacheByTab.monthly=aggregateRanking(items.filter(i=>i.date&&i.date.startsWith(monthPrefix)));
         _rankingCache=_rankingCacheByTab.daily;
         saveRanking(_rankingCache);
         renderRanking();
@@ -666,6 +680,7 @@
     function updateUI(){ moneyEl.textContent=formatMoney(state.money); clickIncomeEl.textContent=formatMoney(state.clickIncome); if(comboDisplayEl){ const cm=state.comboMult||1; comboDisplayEl.textContent='×'+cm.toFixed(1); comboDisplayEl.style.color=cm>=2.5?'#d43000':cm>=1.5?'#e86c00':'#7b2845'; } scoreEl.textContent=state.score.toLocaleString('ko-KR'); renderQuickUpgrades(); checkAbsoluteGoals(); }
     earnBtn.onclick=()=>{ if(state.dailyData && state.dailyData.dailyClicks >= DAILY_CLICK_LIMIT){ showToast('꿀꿀... 오늘 클릭을 다 썼어요! 내일 또 봐요 🌙'); return; } state.combo=Math.min((state.combo||0)+1,10); state.comboMult=parseFloat((1+(state.combo-1)*0.25).toFixed(2)); if(state.combo>=(state.bestCombo||1)) state.bestCombo=state.combo; clearTimeout(state.comboTimer); state.comboTimer=setTimeout(()=>{ state.combo=0; state.comboMult=1; if(comboDisplayEl){comboDisplayEl.textContent='×1.0';comboDisplayEl.style.color='#7b2845';} },1800); const earned=Math.floor(state.clickIncome*state.comboMult); state.money+=earned; state.tapCount+=1; state.score+=1; if(state.dailyData){ state.dailyData.dailyClicks=(state.dailyData.dailyClicks||0)+1; saveDailyData(state.dailyData); } earnBtn.classList.remove('popped'); void earnBtn.offsetWidth; earnBtn.classList.add('popped'); triggerCoinAnimations(); showMoneyFloat(earned,true); updateUI(); triggerEventIfMet(); updateGoalProgress('tap',1); const justFinished=state.dailyData&&state.dailyData.dailyClicks>=DAILY_CLICK_LIMIT&&!state._completeCelebrated; if(justFinished){ state._completeCelebrated=true; setTimeout(()=>{ launchConfetti(); showToast('꿀꿀꿀! 200번 달성했어요! 최고예요 🎊🐷'); },300); } renderClickLimit(); };
     loadQuizData().then(()=>{ updateUI(); renderRanking(); });
+    fetchAndCacheRanking();
 
     // ===== 플레이어 상태 저장 =====
     function generatePlayerId(){
