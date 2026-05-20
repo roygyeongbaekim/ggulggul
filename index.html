@@ -288,12 +288,13 @@
     let _fsSaveTimer = null;
     const TS = () => firebase.database.ServerValue.TIMESTAMP;
 
+    function safeKey(id){ return (id||'').replace(/[^A-Za-z0-9]/g,''); }
     function scheduleFsSave(){ clearTimeout(_fsSaveTimer); _fsSaveTimer = setTimeout(flushPlayerStateToFs, 2000); }
 
     async function flushPlayerStateToFs(){
       if(!db||!state.playerId) return;
       try {
-        await db.ref('playerState/'+state.playerId).set({
+        await db.ref('playerState/'+safeKey(state.playerId)).set({
           money:state.money, clickIncome:state.clickIncome, tapCount:state.tapCount,
           upgradeCount:state.upgradeCount, score:state.score, bestCombo:state.bestCombo,
           currentRound:state.currentRound, completedRounds:state.completedRounds,
@@ -307,21 +308,21 @@
 
     async function loadPlayerStateFromFs(playerId){
       if(!db) return null;
-      try { const s=await db.ref('playerState/'+playerId).get(); return s.exists()?s.val():null; }
+      try { const s=await db.ref('playerState/'+safeKey(playerId)).get(); return s.exists()?s.val():null; }
       catch(e){ console.warn('[DB] playerState 로드 실패:', e); return null; }
     }
 
     async function flushDailyDataToFs(){
       if(!db||!state.playerId||!state.dailyData) return;
       try {
-        const key=state.playerId+'_'+getTodayStr();
+        const key=safeKey(state.playerId)+'_'+getTodayStr();
         await db.ref('dailyData/'+key).set({ playerId:state.playerId, playerName:state.playerName, date:getTodayStr(), ...state.dailyData });
       } catch(e){ console.warn('[DB] dailyData 저장 실패:', e); }
     }
 
     async function loadDailyDataFromFs(playerId){
       if(!db) return null;
-      try { const key=playerId+'_'+getTodayStr(); const s=await db.ref('dailyData/'+key).get(); return s.exists()?s.val():null; }
+      try { const key=safeKey(playerId)+'_'+getTodayStr(); const s=await db.ref('dailyData/'+key).get(); return s.exists()?s.val():null; }
       catch(e){ console.warn('[DB] dailyData 로드 실패:', e); return null; }
     }
 
@@ -365,8 +366,8 @@
     async function saveRankingToFs(entry){
       if(!db||!state.playerId) return;
       try {
-        // 키를 playerId_date로 고정 → 하루 1회 자동 중복 방지
-        const key=state.playerId+'_'+getTodayStr();
+        // 키를 playerId_date로 고정 → 하루 1회 자동 중복 방지 (Firebase 키 안전 문자만 사용)
+        const key=safeKey(state.playerId)+'_'+getTodayStr();
         const dup=await db.ref('ranking/'+key).get();
         if(dup.exists()) return;
         await db.ref('ranking/'+key).set({
@@ -387,7 +388,7 @@
           return foundId;
         }
         const newId=generatePlayerId();
-        await db.ref('players/'+newId).set({ name, playerId:newId, createdAt:TS() });
+        await db.ref('players/'+safeKey(newId)).set({ name, playerId:newId, createdAt:TS() });
         return newId;
       } catch(e){ console.warn('[DB] 플레이어 찾기/생성 실패:', e); return null; }
     }
@@ -486,7 +487,7 @@
         state.playerId=playerId;
         savePlayerState();
         // 5. Firestore 플레이어 lastLoginAt 갱신
-        if(db) db.ref('players/'+playerId).update({name:state.playerName,playerId,lastLoginAt:TS()}).catch(()=>{});
+        if(db) db.ref('players/'+safeKey(playerId)).update({name:state.playerName,playerId,lastLoginAt:TS()}).catch(()=>{});
         // 6. 랭킹 비동기 갱신
         fetchAndCacheRanking();
       } catch(e){
@@ -686,7 +687,7 @@
 
     // ===== 플레이어 상태 저장 =====
     function generatePlayerId(){
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*-_+=?';
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_!@%^&*+=?';
       const arr = new Uint8Array(32);
       crypto.getRandomValues(arr);
       return Array.from(arr).map(b => chars[b % chars.length]).join('');
