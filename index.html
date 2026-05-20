@@ -9,7 +9,7 @@
   <title>꿀꿀 저축챌린지</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap">
-  <link rel="stylesheet" href="style.css?v=20260520">
+  <link rel="stylesheet" href="style.css?v=20260521">
 </head>
 <body>
   <div class="app">
@@ -25,7 +25,12 @@
           <button class="start-btn" id="startBtn">시작하기</button>
         </div>
         <div class="panel" style="margin-top:18px;padding:14px 14px 10px;background:rgba(255,255,255,.56)">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px"><strong style="color:#7b2845">명예의 저축 랭킹</strong><small style="color:var(--muted)">Top 5</small></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><strong style="color:#7b2845">명예의 저축 랭킹</strong><small style="color:var(--muted)">Top 5</small></div>
+          <div id="rankingTabBtns" style="display:flex;gap:6px;margin-bottom:10px">
+            <button class="rank-tab active" data-tab="daily">일일</button>
+            <button class="rank-tab" data-tab="weekly">주간</button>
+            <button class="rank-tab" data-tab="monthly">월간</button>
+          </div>
           <div id="rankingPreview" style="display:grid;gap:8px"></div>
         </div>
       </div>
@@ -57,6 +62,10 @@
         <div class="money"><div style="display:flex;align-items:center;justify-content:center;gap:5px;color:var(--muted);font-size:.82rem;font-weight:700;margin-bottom:2px"><span>💰</span><span>오늘의 저축</span></div><div class="value" id="money">₩0</div><div class="meta"><span>클릭 수익 <strong id="clickIncome" style="color:#e86c00">₩10</strong></span></div></div>
         <div class="tap-area">
           <div class="tap-wrap">
+            <div id="tapDoneOverlay" style="display:none;position:absolute;top:15%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:10;pointer-events:none;width:min(300px,85vw)">
+              <div style="font-size:1.85rem;font-weight:900;color:#7b2845;background:linear-gradient(135deg,rgba(255,240,246,.95),rgba(255,228,239,.95));border:1.5px solid rgba(235,120,155,.45);border-radius:20px;padding:20px 32px;box-shadow:0 6px 20px rgba(235,120,155,.3);line-height:1.3">내일 또 만나요꿀~ 🐷</div>
+              <div id="tapDoneCountdown" style="margin-top:12px;font-size:1.55rem;font-weight:900;color:#e53e3e;background:rgba(255,255,255,.92);border-radius:999px;padding:10px 28px;display:inline-block;box-shadow:0 3px 10px rgba(229,62,62,.18)"></div>
+            </div>
             <button class="tap-button" id="earnBtn" aria-label="돼지저금통 클릭 버튼">
               <div class="piggy">
                 <span class="ear left"></span><span class="ear right"></span><span class="eye left"></span><span class="eye right"></span>
@@ -103,7 +112,7 @@
           <section class="quick"><div class="quick-header">⚡ 빠른 업그레이드</div><div class="up-list" id="quickUpgradeList"></div></section>
         </div>
         
-        <section class="panel" style="margin-top:14px;padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><h3 style="margin:0">실시간 랭킹</h3><button class="small-btn" id="saveScoreBtn">현재 점수 저장</button></div><div id="rankingBoard" style="display:grid;gap:8px"></div></section>
+        <section class="panel" style="margin-top:14px;padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><h3 style="margin:0">실시간 랭킹</h3><div style="display:flex;align-items:center;gap:8px"><span style="font-size:.76rem;color:var(--muted);font-weight:700">오늘</span><button class="small-btn" id="saveScoreBtn">현재 점수 저장</button></div></div><div id="rankingBoard" style="display:grid;gap:8px"></div></section>
 
         <!-- 오늘의 목표 -->
         <div class="panel" id="dailyGoalsCard" style="margin-top:14px;padding:16px">
@@ -210,6 +219,22 @@
     </div>
   </div>
 
+  <!-- 퀴즈 정답 축하 모달 -->
+  <div class="modalbg" id="quizCorrectModal" style="z-index:2200">
+    <div class="modal" style="max-width:360px;text-align:center;gap:14px;padding:24px 20px">
+      <div style="font-size:3.2rem;line-height:1.1">🎊</div>
+      <div style="font-size:1.5rem;font-weight:900;color:#056c72">정답이에요!</div>
+      <div id="quizCorrectBonusAmt" style="font-size:1.8rem;font-weight:900;color:#eb789b"></div>
+      <div style="background:linear-gradient(135deg,#f0fff4,#e6ffed);border-radius:16px;padding:14px 16px;text-align:left;border:1px solid rgba(76,143,90,.2)">
+        <div style="font-size:.75rem;font-weight:800;color:#4c8f5a;margin-bottom:6px">📝 문제</div>
+        <div id="quizCorrectQuestion" style="font-size:.9rem;color:#2d4a2d;font-weight:700;line-height:1.5;margin-bottom:10px"></div>
+        <div style="font-size:.75rem;font-weight:800;color:#4c8f5a;margin-bottom:6px">✅ 정답</div>
+        <div id="quizCorrectAnswer" style="font-size:.9rem;color:#2d4a2d;font-weight:700;line-height:1.5;padding:8px 12px;background:rgba(76,143,90,.12);border-radius:10px"></div>
+      </div>
+      <button class="start-btn" id="quizCorrectClose" style="width:100%;min-height:46px">꿀꿀~ 계속하기! 🐷</button>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
@@ -217,13 +242,14 @@
     let _lastTap = 0;
     document.addEventListener('touchend', e => {
       const now = Date.now();
-      if (now - _lastTap < 300) e.preventDefault();
+      const isEarnBtn = e.target === document.getElementById('earnBtn') || document.getElementById('earnBtn')?.contains(e.target);
+      if (now - _lastTap < 300 && !isEarnBtn) e.preventDefault();
       _lastTap = now;
     }, { passive: false });
   </script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-  <script src="data.js?v=20260520"></script>
+  <script src="data.js?v=20260521"></script>
   <script>
     const state = { money:0, clickIncome:10, tapCount:0, upgradeCount:0, score:0, combo:0, comboMult:1, comboTimer:null, bestCombo:0, quizData:null, currentRound:'easy', roundTriggered:false, completedRounds:{ easy:false, normal:false, hard:false }, playerName:'플레이어', dailyData:null, upgrades:[
       { id:'coffee', icon:'☕', name:'커피 대신 저축', desc:'클릭 수익 +₩8', cost:80, type:'click', value:8, bought:0 },
@@ -258,6 +284,7 @@
       db = firebase.database();
     } catch(e){ console.warn('[DB] Firebase 초기화 실패, localStorage 모드로 실행:', e); }
     let _rankingCache = [];
+    let _rankingCacheByTab = { daily:[], weekly:[], monthly:[] };
     let _fsSaveTimer = null;
     const TS = () => firebase.database.ServerValue.TIMESTAMP;
 
@@ -298,15 +325,20 @@
       catch(e){ console.warn('[DB] dailyData 로드 실패:', e); return null; }
     }
 
+    function getWeekStart(){ const d=new Date(); d.setDate(d.getDate()-6); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+    function getMonthPrefix(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
     async function fetchAndCacheRanking(){
       if(!db) return;
       try {
-        // score 기준 상위 20개 가져와 클라이언트에서 정렬 후 Top 5 캐싱
-        const snap=await db.ref('ranking').orderByChild('score').limitToLast(20).get();
+        const snap=await db.ref('ranking').orderByChild('score').limitToLast(100).get();
         const items=[];
         if(snap.exists()) snap.forEach(child=>items.push(child.val()));
-        items.sort((a,b)=>(b.score-a.score)||(b.money-a.money));
-        _rankingCache=items.slice(0,5);
+        const today=getTodayStr(); const weekStart=getWeekStart(); const monthPrefix=getMonthPrefix();
+        const sortFn=(a,b)=>(b.score-a.score)||(b.money-a.money);
+        _rankingCacheByTab.daily=items.filter(i=>i.date===today).sort(sortFn).slice(0,5);
+        _rankingCacheByTab.weekly=items.filter(i=>i.date&&i.date>=weekStart).sort(sortFn).slice(0,5);
+        _rankingCacheByTab.monthly=items.filter(i=>i.date&&i.date.startsWith(monthPrefix)).sort(sortFn).slice(0,5);
+        _rankingCache=_rankingCacheByTab.daily;
         saveRanking(_rankingCache);
         renderRanking();
       } catch(e){ console.warn('[DB] 랭킹 로드 실패:', e); }
@@ -352,26 +384,36 @@
     function loadRanking(){ if(_rankingCache.length) return _rankingCache; try { return JSON.parse(localStorage.getItem(rankingKey) || '[]'); } catch(e){ return []; } }
     function saveRanking(list){ localStorage.setItem(rankingKey, JSON.stringify(list)); }
     function upsertRanking(){ const list = loadRanking(); const entry = { name: (state.playerName || '플레이어').trim() || '플레이어', score: state.score, money: state.money, savedAt: new Date().toISOString() }; list.push(entry); list.sort((a,b)=> (b.score-a.score) || (b.money-a.money)); const trimmed = list.slice(0,5); saveRanking(trimmed); renderRanking(); saveRankingToFs(entry); showToast('꿀꿀~ 랭킹에 저장했어요! 🐷'); }
+    let _activeRankTab = 'daily';
+    function renderRankList(container, list, showMeBadge){
+      if(!container) return;
+      container.innerHTML = '';
+      if(!list.length){ container.innerHTML = '<div class="rank-row"><div class="rank-badge medal-n">-</div><div><div class="rank-name">아직 기록이 없어요</div><div class="rank-meta">플레이 후 점수를 저장해보세요</div></div><div class="rank-score">-</div></div>'; return; }
+      const me=(state.playerName||'').trim();
+      list.forEach((item,idx)=>{
+        const isMe=showMeBadge&&me&&item.name===me;
+        const row=document.createElement('div');
+        row.className='rank-row'+(isMe?' rank-row-me':'');
+        const medals=['🥇','🥈','🥉'];
+        const badgeClass=idx<3?`medal-${idx+1}`:'medal-n';
+        const badgeContent=idx<3?medals[idx]:idx+1;
+        row.innerHTML=`<div class="rank-badge ${badgeClass}">${badgeContent}</div><div><div class="rank-name">${item.name}${isMe?' <span class="rank-me-badge">나</span>':''}</div><div class="rank-meta">점수 ${item.score.toLocaleString('ko-KR')} · 자산 ${formatMoney(item.money)}</div></div><div class="rank-score">#${idx+1}</div>`;
+        container.appendChild(row);
+      });
+    }
     function renderRanking(){
-      const list = loadRanking();
-      const me = (state.playerName||'').trim();
-      const isGameScreen = !!$('#gameScreen.active');
-      const render = (container) => {
-        if(!container) return;
-        container.innerHTML = '';
-        if(!list.length){ container.innerHTML = '<div class="rank-row"><div class="rank-badge">-</div><div><div class="rank-name">아직 기록이 없어요</div><div class="rank-meta">플레이 후 점수를 저장해보세요</div></div><div class="rank-score">₩0</div></div>'; return; }
-        list.forEach((item, idx)=>{
-          const isMe = isGameScreen && me && item.name === me;
-          const row = document.createElement('div');
-          row.className = 'rank-row' + (isMe ? ' rank-row-me' : '');
-          const medals=['🥇','🥈','🥉'];
-          const badgeClass=idx<3?`medal-${idx+1}`:'medal-n';
-          const badgeContent=idx<3?medals[idx]:idx+1;
-          row.innerHTML = `<div class="rank-badge ${badgeClass}">${badgeContent}</div><div><div class="rank-name">${item.name}${isMe ? ' <span class="rank-me-badge">나</span>' : ''}</div><div class="rank-meta">점수 ${item.score.toLocaleString('ko-KR')} · 자산 ${formatMoney(item.money)}</div></div><div class="rank-score">#${idx+1}</div>`;
-          container.appendChild(row);
-        });
-      };
-      render(rankingPreview); render(rankingBoard);
+      const isGameScreen=!!$('#gameScreen.active');
+      // 게임화면 — 일일 랭킹 + 날짜
+      if(rankingBoard){
+        const dailyList=_rankingCacheByTab.daily.length?_rankingCacheByTab.daily:loadRanking();
+        renderRankList(rankingBoard,dailyList,true);
+
+      }
+      // 인트로화면 — 탭 기반
+      if(rankingPreview){
+        const tabList=_rankingCacheByTab[_activeRankTab].length?_rankingCacheByTab[_activeRankTab]:(_activeRankTab==='daily'?loadRanking():[]);
+        renderRankList(rankingPreview,tabList,false);
+      }
     }
 
     const showToast=m=>{toast.textContent=m;toast.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>toast.classList.remove('show'),1600)};
@@ -397,6 +439,14 @@
       return { ok:true };
     }
     playerNameInput.oninput = () => clearNameError();
+    $$('#rankingTabBtns .rank-tab').forEach(btn=>{
+      btn.onclick=()=>{
+        $$('#rankingTabBtns .rank-tab').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        _activeRankTab=btn.dataset.tab;
+        renderRanking();
+      };
+    });
     $('#introScreen').addEventListener('touchstart', e => { if(e.target !== playerNameInput) playerNameInput.blur(); }, { passive: true });
     $('#introScreen').addEventListener('mousedown', e => { if(e.target !== playerNameInput) playerNameInput.blur(); });
     $('#startBtn').onclick=async()=>{
@@ -433,7 +483,41 @@
       const intro=$('#introScreen'); intro.classList.add('fade-out');
       setTimeout(()=>{ switchScreen('#gameScreen'); const logo=$('#gameScreenLogo'); if(logo) logo.textContent=state.playerName+'의 저축'; renderRanking(); initDailySystem(); updateUI(); }, 380);
     };
+    function showMoneyFloat(amount, positive=true){
+      const el=document.createElement('div');
+      el.className='money-float';
+      el.textContent=(positive?'+':'-')+Math.floor(amount).toLocaleString('ko-KR');
+      el.style.color=positive?'#2e7d32':'#e53e3e';
+      const rect=moneyEl.getBoundingClientRect();
+      el.style.left=(rect.left+rect.width/2)+'px';
+      el.style.top=(rect.top+window.scrollY-10)+'px';
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(),1000);
+    }
     function triggerCoinAnimations(){ coinPop.classList.remove('drop'); void coinPop.offsetWidth; coinPop.classList.add('drop'); const coin=document.createElement('span'); coin.className='coin-entry'; piggyMouth.appendChild(coin); void coin.offsetWidth; coin.classList.add('fly'); pigTail.classList.remove('wiggle'); void pigTail.offsetWidth; pigTail.classList.add('wiggle'); setTimeout(()=>coin.remove(),700); }
+    function triggerCoinEjectAnimations(){
+      const count = 3;
+      for(let i=0;i<count;i++){
+        setTimeout(()=>{
+          const coin=document.createElement('span');
+          coin.className='coin-exit';
+          // 각 코인마다 방향을 살짝 다르게
+          const angle = -20 + i*20;
+          const dist = 55 + i*15;
+          coin.style.setProperty('--ex', `${Math.round(Math.cos((angle-90)*Math.PI/180)*dist)}px`);
+          coin.style.setProperty('--ey', `${Math.round(Math.sin((angle-90)*Math.PI/180)*dist)-20}px`);
+          piggyMouth.appendChild(coin);
+          void coin.offsetWidth;
+          coin.classList.add('eject');
+          // 각 코인 애니메이션 방향 오버라이드
+          coin.style.animation='none';
+          void coin.offsetWidth;
+          coin.style.animation=`coinEjectVar${i} .65s ease-out forwards`;
+          setTimeout(()=>coin.remove(),700);
+        }, i*80);
+      }
+      pigTail.classList.remove('wiggle'); void pigTail.offsetWidth; pigTail.classList.add('wiggle');
+    }
     function changePiggyMood(mood){ const ears=$$('.tap-button .ear'), eyes=$$('.tap-button .eye'); [...ears,...eyes].forEach(el=>el.classList.remove('happy','sad')); [...ears,...eyes].forEach(el=>el.classList.add(mood)); setTimeout(()=>[...ears,...eyes].forEach(el=>el.classList.remove('happy','sad')),1500); }
     const UPGRADE_MAX_COUNT = 5;
     function buyUpgrade(index){
@@ -441,7 +525,9 @@
       if(state.dailyData && state.dailyData.dailyClicks >= DAILY_CLICK_LIMIT){ showToast('꿀꿀... 오늘 클릭을 다 썼어요! 내일 또 봐요 🌙'); return; }
       if(item.bought >= UPGRADE_MAX_COUNT){ showToast(`꿀꿀~ ${item.name}은 더 이상 못해요! 🐷`); return; }
       if(state.money < item.cost){ showToast('꿀꿀... 저축이 부족해요! 더 모아봐요 🐷'); return; }
-      state.money -= item.cost;
+      const costPaid = item.cost;
+      state.money -= costPaid;
+      showMoneyFloat(costPaid, false);
       state.upgradeCount += 1;
       state.score += 15;
       item.bought += 1;
@@ -461,7 +547,7 @@
         state.clickIncome += item.value;
         showToast(`꿀꿀~ ${item.name} 완료! 수익 +₩${item.value} 🐷`);
       }
-      triggerCoinAnimations(); updateUI(); triggerEventIfMet(); updateGoalProgress('upgrade',1); savePlayerState();
+      triggerCoinEjectAnimations(); updateUI(); triggerEventIfMet(); updateGoalProgress('upgrade',1); savePlayerState();
     }
     function renderQuickUpgrades(){
       quickUpgradeList.innerHTML = '';
@@ -502,12 +588,46 @@
         const modal=$('#eventModal'); const title=$('#eventModalTitle'); const question=$('#eventModalQuestion'); const options=$('#eventModalOptions');
         const labels={easy:'기초 · 비상금/예적금',normal:'일반 · 카드/대출',hard:'심화 · 투자/세금'};
         modal.style.display='flex'; title.textContent=`${quiz.title} [${labels[roundKey]||roundKey}]`; question.textContent=quiz.question; options.innerHTML='';
-        quiz.options.forEach((opt,idx)=>{ const btn=document.createElement('button'); btn.className='qbtn'; btn.textContent=opt; btn.onclick=()=>{ const correct=idx===quiz.answer; if(correct){ state.money+=quiz.bonus; state.score+=10; changePiggyMood('happy'); updateGoalProgress('quizCorrect',1); showToast(`꿀꿀! 정답이에요~ +₩${quiz.bonus} 🎉`);} else { changePiggyMood('sad'); showToast('꿀꿀... 틀렸어요ㅠ 다음엔 맞춰요 🐷'); } updateUI(); closeEventModal(); state.completedRounds[roundKey]=true; const next=roundLevels[roundKey]?.next; state.currentRound=next||null; state.roundTriggered=false; }; options.appendChild(btn); });
+        quiz.options.forEach((opt,idx)=>{ const btn=document.createElement('button'); btn.className='qbtn'; btn.textContent=opt; btn.onclick=()=>{
+          const correct=idx===quiz.answer;
+          // 모든 버튼 비활성화 + 정답/오답 표시
+          $$('#eventModalOptions .qbtn').forEach((b,i)=>{
+            b.disabled=true;
+            if(i===quiz.answer) b.classList.add('correct-answer');
+            else if(i===idx&&!correct) b.classList.add('wrong');
+          });
+          if(correct){
+            state.money+=quiz.bonus; state.score+=10; changePiggyMood('happy'); updateGoalProgress('quizCorrect',1); updateUI();
+            showMoneyFloat(quiz.bonus,true);
+            state.completedRounds[roundKey]=true; const next=roundLevels[roundKey]?.next; state.currentRound=next||null; state.roundTriggered=false;
+            savePlayerState();
+            setTimeout(()=>{
+              closeEventModal();
+              launchConfetti();
+              $('#quizCorrectBonusAmt').textContent='+'+formatMoney(quiz.bonus)+' 획득!';
+              $('#quizCorrectQuestion').textContent=quiz.question;
+              $('#quizCorrectAnswer').textContent=quiz.options[quiz.answer];
+              $('#quizCorrectModal').style.display='flex';
+            }, 400);
+          } else {
+            changePiggyMood('sad');
+            // 오답 멘트를 버튼 아래에 표시
+            let wrongMsg=$('#quizWrongMsg');
+            if(!wrongMsg){ wrongMsg=document.createElement('div'); wrongMsg.id='quizWrongMsg'; wrongMsg.style.cssText='margin-top:10px;padding:10px 14px;border-radius:14px;background:rgba(229,62,62,.08);color:#c0392b;font-weight:700;font-size:.88rem;text-align:center;line-height:1.5'; options.after(wrongMsg); }
+            wrongMsg.textContent='꿀꿀... 아쉬워요 🐷 정답은 초록색으로 표시했어요!';
+            // 닫기 버튼 텍스트 변경
+            const closeBtn=$('#eventModalClose'); if(closeBtn) closeBtn.textContent='확인하고 닫기';
+            // 라운드는 종료 처리 (오답이어도 기회는 소진)
+            state.completedRounds[roundKey]=true; const next=roundLevels[roundKey]?.next; state.currentRound=next||null; state.roundTriggered=false;
+            savePlayerState();
+          }
+        }; options.appendChild(btn); });
       }, 1700);
     }
-    function closeEventModal(){ $('#eventModal').style.display='none'; }
+    function closeEventModal(){ $('#eventModal').style.display='none'; const wm=$('#quizWrongMsg'); if(wm) wm.remove(); const cb=$('#eventModalClose'); if(cb) cb.textContent='닫기'; }
     $('#eventModalClose').onclick=()=>{
-      $('#quizCloseConfirm').style.display='flex';
+      const isAnswered = !!$('#quizWrongMsg');
+      if(isAnswered){ closeEventModal(); } else { $('#quizCloseConfirm').style.display='flex'; }
     };
     document.getElementById('quizCloseCancel').onclick=()=>{
       $('#quizCloseConfirm').style.display='none';
@@ -519,8 +639,9 @@
     function pickQuiz(roundKey){
       const list = state.quizData[roundKey] || [];
       if(!list.length) return null;
-      if(!state.usedQuizIndices) state.usedQuizIndices = { easy:[], normal:[], hard:[] };
-      const used = state.usedQuizIndices[roundKey] || [];
+      if(!state.usedQuizIndices) state.usedQuizIndices = {};
+      if(!state.usedQuizIndices[roundKey]) state.usedQuizIndices[roundKey] = [];
+      const used = state.usedQuizIndices[roundKey];
       let available = list.map((_,i) => i).filter(i => !used.includes(i));
       if(!available.length){
         state.usedQuizIndices[roundKey] = [];
@@ -543,7 +664,7 @@
       showEventModal(quiz,roundKey);
     }
     function updateUI(){ moneyEl.textContent=formatMoney(state.money); clickIncomeEl.textContent=formatMoney(state.clickIncome); if(comboDisplayEl){ const cm=state.comboMult||1; comboDisplayEl.textContent='×'+cm.toFixed(1); comboDisplayEl.style.color=cm>=2.5?'#d43000':cm>=1.5?'#e86c00':'#7b2845'; } scoreEl.textContent=state.score.toLocaleString('ko-KR'); renderQuickUpgrades(); checkAbsoluteGoals(); }
-    earnBtn.onclick=()=>{ if(state.dailyData && state.dailyData.dailyClicks >= DAILY_CLICK_LIMIT){ showToast('꿀꿀... 오늘 클릭을 다 썼어요! 내일 또 봐요 🌙'); return; } state.combo=Math.min((state.combo||0)+1,10); state.comboMult=parseFloat((1+(state.combo-1)*0.25).toFixed(2)); if(state.combo>=(state.bestCombo||1)) state.bestCombo=state.combo; clearTimeout(state.comboTimer); state.comboTimer=setTimeout(()=>{ state.combo=0; state.comboMult=1; if(comboDisplayEl){comboDisplayEl.textContent='×1.0';comboDisplayEl.style.color='#7b2845';} },1800); const earned=Math.floor(state.clickIncome*state.comboMult); state.money+=earned; state.tapCount+=1; state.score+=1; if(state.dailyData){ state.dailyData.dailyClicks=(state.dailyData.dailyClicks||0)+1; saveDailyData(state.dailyData); } earnBtn.classList.remove('popped'); void earnBtn.offsetWidth; earnBtn.classList.add('popped'); triggerCoinAnimations(); updateUI(); triggerEventIfMet(); updateGoalProgress('tap',1); const justFinished=state.dailyData&&state.dailyData.dailyClicks>=DAILY_CLICK_LIMIT&&!state._completeCelebrated; if(justFinished){ state._completeCelebrated=true; setTimeout(()=>{ launchConfetti(); showToast('꿀꿀꿀! 200번 달성했어요! 최고예요 🎊🐷'); },300); } renderClickLimit(); };
+    earnBtn.onclick=()=>{ if(state.dailyData && state.dailyData.dailyClicks >= DAILY_CLICK_LIMIT){ showToast('꿀꿀... 오늘 클릭을 다 썼어요! 내일 또 봐요 🌙'); return; } state.combo=Math.min((state.combo||0)+1,10); state.comboMult=parseFloat((1+(state.combo-1)*0.25).toFixed(2)); if(state.combo>=(state.bestCombo||1)) state.bestCombo=state.combo; clearTimeout(state.comboTimer); state.comboTimer=setTimeout(()=>{ state.combo=0; state.comboMult=1; if(comboDisplayEl){comboDisplayEl.textContent='×1.0';comboDisplayEl.style.color='#7b2845';} },1800); const earned=Math.floor(state.clickIncome*state.comboMult); state.money+=earned; state.tapCount+=1; state.score+=1; if(state.dailyData){ state.dailyData.dailyClicks=(state.dailyData.dailyClicks||0)+1; saveDailyData(state.dailyData); } earnBtn.classList.remove('popped'); void earnBtn.offsetWidth; earnBtn.classList.add('popped'); triggerCoinAnimations(); showMoneyFloat(earned,true); updateUI(); triggerEventIfMet(); updateGoalProgress('tap',1); const justFinished=state.dailyData&&state.dailyData.dailyClicks>=DAILY_CLICK_LIMIT&&!state._completeCelebrated; if(justFinished){ state._completeCelebrated=true; setTimeout(()=>{ launchConfetti(); showToast('꿀꿀꿀! 200번 달성했어요! 최고예요 🎊🐷'); },300); } renderClickLimit(); };
     loadQuizData().then(()=>{ updateUI(); renderRanking(); });
 
     // ===== 플레이어 상태 저장 =====
@@ -626,7 +747,11 @@
       textEl.style.color=pct>=100?'#e53e3e':pct>=70?'#ff6b1a':'#7b2845';
       const over=used>=DAILY_CLICK_LIMIT;
       earnBtn.style.opacity=over?'0.45':''; earnBtn.style.filter=over?'grayscale(55%)':''; earnBtn.style.cursor=over?'not-allowed':'';
-      if(cdEl){ if(over){ cdEl.style.display='block'; cdEl.textContent='😴 내일 '+formatCountdown(getSecondsUntilMidnight())+' 후 초기화'; } else { cdEl.style.display='none'; } }
+      if(cdEl) cdEl.style.display='none';
+      const overlay=document.getElementById('tapDoneOverlay');
+      const cdDone=document.getElementById('tapDoneCountdown');
+      if(overlay){ overlay.style.display=over?'block':'none'; }
+      if(cdDone&&over){ cdDone.textContent='⏰ '+formatCountdown(getSecondsUntilMidnight())+' 후 초기화'; }
       // 완료 카드 표시
       const completeCard=document.getElementById('dailyCompleteCard');
       if(completeCard){
@@ -890,6 +1015,9 @@
     }
     document.getElementById('celebrationCloseBtn').onclick=()=>{
       document.getElementById('celebrationModal').style.display='none';
+    };
+    document.getElementById('quizCorrectClose').onclick=()=>{
+      document.getElementById('quizCorrectModal').style.display='none';
     };
 
     // ===== 데이터 초기화 =====
