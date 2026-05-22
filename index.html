@@ -408,7 +408,7 @@
     const rankingKey = 'ggul-saving-ranking-v1';
     function loadRanking(){ if(_rankingCache.length) return _rankingCache; try { return JSON.parse(localStorage.getItem(rankingKey) || '[]'); } catch(e){ return []; } }
     function saveRanking(list){ localStorage.setItem(rankingKey, JSON.stringify(list)); }
-    function upsertRanking(){ const list = loadRanking(); const entry = { name: (state.playerName || '플레이어').trim() || '플레이어', score: state.score, money: state.money, savedAt: new Date().toISOString() }; list.push(entry); list.sort((a,b)=> (b.score-a.score) || (b.money-a.money)); const trimmed = list.slice(0,5); saveRanking(trimmed); renderRanking(); saveRankingToFs(entry); showToast('꿀꿀~ 랭킹에 저장했어요! 🐷'); }
+    function upsertRanking(){ const entry = { name: (state.playerName || '플레이어').trim() || '플레이어', score: state.score, money: state.money, savedAt: new Date().toISOString() }; saveRankingToFs(entry); showToast('꿀꿀~ 랭킹에 저장했어요! 🐷'); }
     let _activeRankTab = 'daily';
     function renderRankList(container, list, showMeBadge){
       if(!container) return;
