@@ -25,7 +25,7 @@
           <button class="start-btn" id="startBtn">시작하기</button>
         </div>
         <div class="panel" style="margin-top:18px;padding:14px 14px 10px;background:rgba(255,255,255,.56)">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><strong style="color:#7b2845">명예의 저축 랭킹</strong><small style="color:var(--muted)">Top 5</small></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><strong style="color:#7b2845">👑 명예의 저축왕</strong><small style="color:var(--muted)">Top 5</small></div>
           <div id="rankingTabBtns" style="display:flex;gap:6px;margin-bottom:10px">
             <button class="rank-tab active" data-tab="daily">일일</button>
             <button class="rank-tab" data-tab="weekly">주간</button>
@@ -439,7 +439,7 @@
         const badgeClass=idx<3?`medal-${idx+1}`:'medal-n';
         const badgeContent=idx<3?medals[idx]:idx+1;
         const dateTag=(showDate&&item.date)?` <span style="font-size:.72rem;color:var(--muted);font-weight:600">(${fmtRankDate(item.date)})</span>`:'';
-        row.innerHTML=`<div class="rank-badge ${badgeClass}">${badgeContent}</div><div><div class="rank-name">${item.name}${isMe?' <span class="rank-me-badge">나</span>':''}${dateTag}</div><div class="rank-meta">점수 ${item.score.toLocaleString('ko-KR')} · 자산 ${formatMoney(item.money)}</div></div><div class="rank-score">#${idx+1}</div>`;
+        row.innerHTML=`<div class="rank-badge ${badgeClass}">${badgeContent}</div><div><div class="rank-name">${item.name}${isMe?' <span class="rank-me-badge">나</span>':''}${dateTag}</div><div class="rank-meta">점수 ${item.score.toLocaleString('ko-KR')} · 자산 ${formatMoney(item.money)}</div></div>`;
         container.appendChild(row);
       });
     }
