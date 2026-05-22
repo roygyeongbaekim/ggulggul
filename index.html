@@ -112,7 +112,7 @@
           <section class="quick"><div class="quick-header">⚡ 빠른 업그레이드</div><div class="up-list" id="quickUpgradeList"></div></section>
         </div>
         
-        <section class="panel" style="margin-top:14px;padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><h3 style="margin:0">실시간 랭킹</h3><div style="display:flex;align-items:center;gap:8px"><span style="font-size:.76rem;color:var(--muted);font-weight:700">오늘</span><button class="small-btn" id="saveScoreBtn">현재 점수 저장</button></div></div><div id="rankingBoard" style="display:grid;gap:8px"></div></section>
+        <section class="panel" style="margin-top:14px;padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><h3 style="margin:0">실시간 랭킹</h3><span style="font-size:.76rem;color:var(--muted);font-weight:700">오늘</span></div><div id="rankingBoard" style="display:grid;gap:8px"></div></section>
 
         <!-- 오늘의 목표 -->
         <div class="panel" id="dailyGoalsCard" style="margin-top:14px;padding:16px">
@@ -388,7 +388,7 @@
         rebuildRankingCache();
         saveRanking(_rankingCache);
         renderRanking();
-      } catch(e){ console.warn('[DB] 랭킹 저장 실패:', e); }
+      } catch(e){ console.warn('[DB] 랭킹 저장 실패:', e); showToast('꿀꿀... 저장에 실패했어요. 잠시 후 다시 시도해주세요 🐷'); }
     }
 
     async function findOrCreatePlayer(name){
@@ -773,9 +773,7 @@
       } catch(e) {}
     }
     function isRankingSavedToday(){
-      const today = getTodayStr();
-      if(state.rankingSavedDate === today) return true;
-      return !!state.dailyData?.rankingSaved;
+      return !!(state.dailyData?.rankingSaved);
     }
     function resetDailyQuizState(){
       state.currentRound = 'easy';
@@ -841,25 +839,19 @@
       const msg = document.getElementById('resultSavedMsg');
       if(btn){ btn.disabled = saved; btn.style.opacity = saved ? '0.5' : ''; }
       if(msg) msg.style.display = saved ? 'block' : 'none';
-      // 실시간 랭킹 저장 버튼 — 200번 도달 후 저장했을 때만 비활성화
-      const scoreBtn = document.getElementById('saveScoreBtn');
-      if(scoreBtn){
-        const disabled = clicksDone && saved;
-        scoreBtn.disabled = disabled;
-        scoreBtn.style.opacity = disabled ? '0.5' : '';
-        scoreBtn.textContent = disabled ? '✅ 저장됨' : '현재 점수 저장';
-      }
     }
     function doSaveRanking(){
       const clicksDone = (state.dailyData?.dailyClicks||0) >= DAILY_CLICK_LIMIT;
       if(clicksDone && isRankingSavedToday()){ showToast('꿀꿀~ 이미 저장했어요! 🐷'); return; }
       upsertRanking();
-      state.rankingSavedDate = getTodayStr();
-      if(state.dailyData){ state.dailyData.rankingSaved = true; saveDailyData(state.dailyData); } else { savePlayerState(); }
+      // 200번 완료 후 저장만 최종 저장으로 처리 → 완료 카드 버튼 비활성화
+      if(clicksDone){
+        state.rankingSavedDate = getTodayStr();
+        if(state.dailyData){ state.dailyData.rankingSaved = true; saveDailyData(state.dailyData); } else { savePlayerState(); }
+      }
       applyRankingSavedState();
     }
     document.getElementById('resultSaveBtn').onclick = doSaveRanking;
-    $('#saveScoreBtn').onclick = doSaveRanking;
 
     function getTodayStr(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
     function loadDailyData(){ try{ return JSON.parse(localStorage.getItem(getDailyKey())||'null'); }catch(e){ return null; } }
