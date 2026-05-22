@@ -361,9 +361,10 @@
       if(showLoading) showRankingLoading();
       try {
         const snap=await db.ref('ranking').get();
-        _allRankingItems=[];
-        if(snap.exists()) snap.forEach(child=>_allRankingItems.push(child.val()));
+        _allRankingItems=snap.exists()?Object.values(snap.val()||{}).filter(v=>v&&v.date):[];
+        console.log('[Ranking] 불러온 항목 수:', _allRankingItems.length, '오늘:', getTodayStr());
         rebuildRankingCache();
+        console.log('[Ranking] 캐시 결과:', { daily:_rankingCacheByTab.daily.length, weekly:_rankingCacheByTab.weekly.length, monthly:_rankingCacheByTab.monthly.length });
         saveRanking(_rankingCache);
         renderRanking();
       } catch(e){ console.warn('[DB] 랭킹 로드 실패:', e); renderRanking(); }
@@ -416,7 +417,7 @@
     function renderRankList(container, list, showMeBadge){
       if(!container) return;
       container.innerHTML = '';
-      if(!list.length){ container.innerHTML = '<div class="rank-row"><div class="rank-badge medal-n">-</div><div><div class="rank-name">아직 기록이 없어요</div><div class="rank-meta">플레이 후 점수를 저장해보세요</div></div><div class="rank-score">-</div></div>'; return; }
+      if(!list||!list.length){ container.innerHTML = '<div class="rank-row"><div class="rank-badge medal-n">-</div><div><div class="rank-name">아직 기록이 없어요</div><div class="rank-meta">플레이 후 점수를 저장해보세요</div></div><div class="rank-score">-</div></div>'; return; }
       const me=(state.playerName||'').trim();
       list.forEach((item,idx)=>{
         const isMe=showMeBadge&&me&&item.name===me;
