@@ -343,24 +343,26 @@
       if(rankingPreview) rankingPreview.innerHTML='<div class="ranking-loading"><div class="ranking-spinner"></div><div style="font-size:.82rem;color:var(--muted);font-weight:700">랭킹 불러오는 중...</div></div>';
     }
     async function fetchAndCacheRanking(showLoading=false){
-      if(!db) return;
+      // db가 아직 준비 안됐으면 최대 5초 대기
+      if(!db){
+        let waited=0;
+        await new Promise(res=>{ const t=setInterval(()=>{ waited+=200; if(db||waited>=5000){ clearInterval(t); res(); } },200); });
+      }
+      if(!db){ renderRanking(); return; }
       if(showLoading) showRankingLoading();
       try {
-        const snap=await db.ref('ranking').orderByChild('score').limitToLast(500).get();
+        const snap=await db.ref('ranking').get();
         const items=[];
         if(snap.exists()) snap.forEach(child=>items.push(child.val()));
         const today=getTodayStr(); const weekStart=getWeekStart(); const monthPrefix=getMonthPrefix();
         const sortFn=(a,b)=>(b.score-a.score)||(b.money-a.money);
-        // 일일: 오늘 데이터만, 점수 높은 순
         _rankingCacheByTab.daily=items.filter(i=>i.date===today).sort(sortFn).slice(0,5);
-        // 주간: 이번 주(7일) 데이터 플레이어별 합산
         _rankingCacheByTab.weekly=aggregateRanking(items.filter(i=>i.date&&i.date>=weekStart));
-        // 월간: 이번 달 데이터 플레이어별 합산
         _rankingCacheByTab.monthly=aggregateRanking(items.filter(i=>i.date&&i.date.startsWith(monthPrefix)));
         _rankingCache=_rankingCacheByTab.daily;
         saveRanking(_rankingCache);
         renderRanking();
-      } catch(e){ console.warn('[DB] 랭킹 로드 실패:', e); }
+      } catch(e){ console.warn('[DB] 랭킹 로드 실패:', e); renderRanking(); }
     }
 
     async function saveRankingToFs(entry){
