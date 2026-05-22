@@ -378,10 +378,8 @@
     async function saveRankingToFs(entry){
       if(!db||!state.playerId) return;
       try {
-        // 키를 playerId_date로 고정 → 하루 1회 자동 중복 방지
+        // 키를 playerId_date로 고정 → 같은 날 여러 번 저장 시 덮어쓰기
         const key=safeKey(state.playerId)+'_'+getTodayStr();
-        const dup=await db.ref('ranking/'+key).get();
-        if(dup.exists()) return;
         const fsEntry={ playerId:state.playerId, name:entry.name, score:entry.score, money:entry.money, date:getTodayStr(), savedAt:TS() };
         await db.ref('ranking/'+key).set(fsEntry);
         // 저장 성공 후 전체 아이템 배열에 반영 → rebuildRankingCache로 정확하게 재계산
@@ -837,17 +835,24 @@
 
     function applyRankingSavedState(){
       const saved = isRankingSavedToday();
+      const clicksDone = (state.dailyData?.dailyClicks||0) >= DAILY_CLICK_LIMIT;
+      // 완료 카드 저장 버튼 — 200번 도달 후 1회 저장하면 비활성화
       const btn = document.getElementById('resultSaveBtn');
       const msg = document.getElementById('resultSavedMsg');
-      if(!btn) return;
-      btn.disabled = saved;
-      btn.style.opacity = saved ? '0.5' : '';
+      if(btn){ btn.disabled = saved; btn.style.opacity = saved ? '0.5' : ''; }
       if(msg) msg.style.display = saved ? 'block' : 'none';
+      // 실시간 랭킹 저장 버튼 — 200번 도달 후 저장했을 때만 비활성화
       const scoreBtn = document.getElementById('saveScoreBtn');
-      if(scoreBtn){ scoreBtn.disabled = saved; scoreBtn.style.opacity = saved ? '0.5' : ''; scoreBtn.textContent = saved ? '✅ 저장됨' : '현재 점수 저장'; }
+      if(scoreBtn){
+        const disabled = clicksDone && saved;
+        scoreBtn.disabled = disabled;
+        scoreBtn.style.opacity = disabled ? '0.5' : '';
+        scoreBtn.textContent = disabled ? '✅ 저장됨' : '현재 점수 저장';
+      }
     }
     function doSaveRanking(){
-      if(isRankingSavedToday()){ showToast('꿀꿀~ 오늘은 이미 저장했어요! 🐷'); return; }
+      const clicksDone = (state.dailyData?.dailyClicks||0) >= DAILY_CLICK_LIMIT;
+      if(clicksDone && isRankingSavedToday()){ showToast('꿀꿀~ 이미 저장했어요! 🐷'); return; }
       upsertRanking();
       state.rankingSavedDate = getTodayStr();
       if(state.dailyData){ state.dailyData.rankingSaved = true; saveDailyData(state.dailyData); } else { savePlayerState(); }
