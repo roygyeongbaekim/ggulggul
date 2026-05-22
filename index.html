@@ -285,6 +285,7 @@
     } catch(e){ console.warn('[DB] Firebase 초기화 실패, localStorage 모드로 실행:', e); }
     let _rankingCache = [];
     let _rankingCacheByTab = { daily:[], weekly:[], monthly:[] };
+    let _allRankingItems = [];
     let _fsSaveTimer = null;
     const TS = () => firebase.database.ServerValue.TIMESTAMP;
 
@@ -326,7 +327,7 @@
       catch(e){ console.warn('[DB] dailyData 로드 실패:', e); return null; }
     }
 
-    function getWeekStart(){ const d=new Date(); d.setDate(d.getDate()-6); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+    function getWeekStart(){ const d=new Date(); const day=d.getDay(); const diff=day===0?6:day-1; d.setDate(d.getDate()-diff); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
     function getMonthPrefix(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
     // 여러 날 데이터를 플레이어별로 합산 후 Top5 반환
     function aggregateRanking(items){
@@ -342,6 +343,14 @@
     function showRankingLoading(){
       if(rankingPreview) rankingPreview.innerHTML='<div class="ranking-loading"><div class="ranking-spinner"></div><div style="font-size:.82rem;color:var(--muted);font-weight:700">랭킹 불러오는 중...</div></div>';
     }
+    function rebuildRankingCache(){
+      const today=getTodayStr(); const weekStart=getWeekStart(); const monthPrefix=getMonthPrefix();
+      const sortFn=(a,b)=>(b.score-a.score)||(b.money-a.money);
+      _rankingCacheByTab.daily=_allRankingItems.filter(i=>i.date===today).sort(sortFn).slice(0,5);
+      _rankingCacheByTab.weekly=aggregateRanking(_allRankingItems.filter(i=>i.date&&i.date>=weekStart));
+      _rankingCacheByTab.monthly=aggregateRanking(_allRankingItems.filter(i=>i.date&&i.date.startsWith(monthPrefix)));
+      _rankingCache=_rankingCacheByTab.daily;
+    }
     async function fetchAndCacheRanking(showLoading=false){
       // db가 아직 준비 안됐으면 최대 5초 대기
       if(!db){
@@ -352,14 +361,9 @@
       if(showLoading) showRankingLoading();
       try {
         const snap=await db.ref('ranking').get();
-        const items=[];
-        if(snap.exists()) snap.forEach(child=>items.push(child.val()));
-        const today=getTodayStr(); const weekStart=getWeekStart(); const monthPrefix=getMonthPrefix();
-        const sortFn=(a,b)=>(b.score-a.score)||(b.money-a.money);
-        _rankingCacheByTab.daily=items.filter(i=>i.date===today).sort(sortFn).slice(0,5);
-        _rankingCacheByTab.weekly=aggregateRanking(items.filter(i=>i.date&&i.date>=weekStart));
-        _rankingCacheByTab.monthly=aggregateRanking(items.filter(i=>i.date&&i.date.startsWith(monthPrefix)));
-        _rankingCache=_rankingCacheByTab.daily;
+        _allRankingItems=[];
+        if(snap.exists()) snap.forEach(child=>_allRankingItems.push(child.val()));
+        rebuildRankingCache();
         saveRanking(_rankingCache);
         renderRanking();
       } catch(e){ console.warn('[DB] 랭킹 로드 실패:', e); renderRanking(); }
@@ -374,13 +378,10 @@
         if(dup.exists()) return;
         const fsEntry={ playerId:state.playerId, name:entry.name, score:entry.score, money:entry.money, date:getTodayStr(), savedAt:TS() };
         await db.ref('ranking/'+key).set(fsEntry);
-        // 저장 성공 후 캐시에 직접 추가 → 재조회 없이 즉시 반영
-        const sortFn=(a,b)=>(b.score-a.score)||(b.money-a.money);
-        const newEntry={ playerId:state.playerId, name:entry.name, score:entry.score, money:entry.money, date:getTodayStr() };
-        ['daily','weekly','monthly'].forEach(tab=>{
-          _rankingCacheByTab[tab]=[..._rankingCacheByTab[tab],newEntry].sort(sortFn).slice(0,5);
-        });
-        _rankingCache=_rankingCacheByTab.daily;
+        // 저장 성공 후 전체 아이템 배열에 반영 → rebuildRankingCache로 정확하게 재계산
+        _allRankingItems=_allRankingItems.filter(i=>!(i.playerId===state.playerId&&i.date===getTodayStr()));
+        _allRankingItems.push({ playerId:state.playerId, name:entry.name, score:entry.score, money:entry.money, date:getTodayStr() });
+        rebuildRankingCache();
         saveRanking(_rankingCache);
         renderRanking();
       } catch(e){ console.warn('[DB] 랭킹 저장 실패:', e); }
@@ -596,8 +597,25 @@
         quickUpgradeList.appendChild(btn);
       });
     }
+    function pauseCombo(){
+      if(state.comboPaused) return;
+      state.comboPaused=true;
+      clearTimeout(state.comboTimer);
+      state.comboTimer=null;
+      state._comboPauseRemaining=state._comboTimerEnd?Math.max(0,state._comboTimerEnd-Date.now()):0;
+    }
+    function resumeCombo(){
+      if(!state.comboPaused) return;
+      state.comboPaused=false;
+      if(state._comboPauseRemaining>0){
+        state._comboTimerEnd=Date.now()+state._comboPauseRemaining;
+        state.comboTimer=setTimeout(()=>{ state.combo=0; state.comboMult=1; state._comboTimerEnd=null; if(comboDisplayEl){comboDisplayEl.textContent='×1.0';comboDisplayEl.style.color='#7b2845';} },state._comboPauseRemaining);
+      }
+      state._comboPauseRemaining=0;
+    }
     async function loadQuizData(){ try{ const res=await fetch('./v10-full.json'); state.quizData=await res.json(); } catch(e){ state.quizData={easy:[],normal:[],hard:[]}; } }
     function showEventModal(quiz, roundKey){
+      pauseCombo();
       const announce=document.getElementById('quizAnnounce');
       if(announce){
         // 애니메이션 리셋 후 봉투 오버레이 표시
@@ -649,7 +667,7 @@
         }; options.appendChild(btn); });
       }, 1700);
     }
-    function closeEventModal(){ $('#eventModal').style.display='none'; const wm=$('#quizWrongMsg'); if(wm) wm.remove(); const cb=$('#eventModalClose'); if(cb) cb.textContent='닫기'; }
+    function closeEventModal(){ resumeCombo(); $('#eventModal').style.display='none'; const wm=$('#quizWrongMsg'); if(wm) wm.remove(); const cb=$('#eventModalClose'); if(cb) cb.textContent='닫기'; }
     $('#eventModalClose').onclick=()=>{
       const isAnswered = !!$('#quizWrongMsg');
       if(isAnswered){ closeEventModal(); } else { $('#quizCloseConfirm').style.display='flex'; }
@@ -689,7 +707,7 @@
       showEventModal(quiz,roundKey);
     }
     function updateUI(){ moneyEl.textContent=formatMoney(state.money); clickIncomeEl.textContent=formatMoney(state.clickIncome); if(comboDisplayEl){ const cm=state.comboMult||1; comboDisplayEl.textContent='×'+cm.toFixed(1); comboDisplayEl.style.color=cm>=2.5?'#d43000':cm>=1.5?'#e86c00':'#7b2845'; } scoreEl.textContent=state.score.toLocaleString('ko-KR'); renderQuickUpgrades(); checkAbsoluteGoals(); }
-    earnBtn.onclick=()=>{ if(state.dailyData && state.dailyData.dailyClicks >= DAILY_CLICK_LIMIT){ showToast('꿀꿀... 오늘 클릭을 다 썼어요! 내일 또 봐요 🌙'); return; } state.combo=Math.min((state.combo||0)+1,10); state.comboMult=parseFloat((1+(state.combo-1)*0.25).toFixed(2)); if(state.combo>=(state.bestCombo||1)) state.bestCombo=state.combo; clearTimeout(state.comboTimer); state.comboTimer=setTimeout(()=>{ state.combo=0; state.comboMult=1; if(comboDisplayEl){comboDisplayEl.textContent='×1.0';comboDisplayEl.style.color='#7b2845';} },1800); const earned=Math.floor(state.clickIncome*state.comboMult); state.money+=earned; state.tapCount+=1; state.score+=1; if(state.dailyData){ state.dailyData.dailyClicks=(state.dailyData.dailyClicks||0)+1; saveDailyData(state.dailyData); } earnBtn.classList.remove('popped'); void earnBtn.offsetWidth; earnBtn.classList.add('popped'); triggerCoinAnimations(); showMoneyFloat(earned,true); updateUI(); triggerEventIfMet(); updateGoalProgress('tap',1); const justFinished=state.dailyData&&state.dailyData.dailyClicks>=DAILY_CLICK_LIMIT&&!state._completeCelebrated; if(justFinished){ state._completeCelebrated=true; setTimeout(()=>{ launchConfetti(); showToast('꿀꿀꿀! 200번 달성했어요! 최고예요 🎊🐷'); },300); } renderClickLimit(); };
+    earnBtn.onclick=()=>{ if(state.dailyData && state.dailyData.dailyClicks >= DAILY_CLICK_LIMIT){ showToast('꿀꿀... 오늘 클릭을 다 썼어요! 내일 또 봐요 🌙'); return; } state.combo=Math.min((state.combo||0)+1,10); state.comboMult=parseFloat((1+(state.combo-1)*0.25).toFixed(2)); if(state.combo>=(state.bestCombo||1)) state.bestCombo=state.combo; clearTimeout(state.comboTimer); state._comboTimerEnd=Date.now()+1800; state.comboTimer=setTimeout(()=>{ state.combo=0; state.comboMult=1; state._comboTimerEnd=null; if(comboDisplayEl){comboDisplayEl.textContent='×1.0';comboDisplayEl.style.color='#7b2845';} },1800); const earned=Math.floor(state.clickIncome*state.comboMult); state.money+=earned; state.tapCount+=1; state.score+=1; if(state.dailyData){ state.dailyData.dailyClicks=(state.dailyData.dailyClicks||0)+1; saveDailyData(state.dailyData); } earnBtn.classList.remove('popped'); void earnBtn.offsetWidth; earnBtn.classList.add('popped'); triggerCoinAnimations(); showMoneyFloat(earned,true); updateUI(); triggerEventIfMet(); updateGoalProgress('tap',1); const justFinished=state.dailyData&&state.dailyData.dailyClicks>=DAILY_CLICK_LIMIT&&!state._completeCelebrated; if(justFinished){ state._completeCelebrated=true; setTimeout(()=>{ launchConfetti(); showToast('꿀꿀꿀! 200번 달성했어요! 최고예요 🎊🐷'); },300); } renderClickLimit(); };
     loadQuizData().then(()=>{ updateUI(); renderRanking(); });
     fetchAndCacheRanking(true);
 
