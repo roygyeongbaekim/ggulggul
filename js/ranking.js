@@ -118,3 +118,35 @@ $$('#rankingTabBtns .rank-tab').forEach(btn=>{
     renderRanking();
   };
 });
+
+// ===== 랭킹 모달 =====
+let _modalRankTab = 'daily';
+
+function renderRankingModal(){
+  const list = document.getElementById('rankingModalList');
+  renderRankList(list, _rankingCacheByTab[_modalRankTab], true, _modalRankTab !== 'daily');
+}
+
+function openRankingModal(){
+  _modalRankTab = 'daily';
+  $$('#rankingModalTabBtns .rank-tab').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab === 'daily');
+  });
+  renderRankingModal();
+  document.getElementById('rankingModal').style.display = 'flex';
+}
+
+document.getElementById('rankingBoardTitle').onclick = openRankingModal;
+
+document.getElementById('rankingModalClose').onclick = () => {
+  document.getElementById('rankingModal').style.display = 'none';
+};
+
+$$('#rankingModalTabBtns .rank-tab').forEach(btn=>{
+  btn.onclick=()=>{
+    $$('#rankingModalTabBtns .rank-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    _modalRankTab = btn.dataset.tab;
+    renderRankingModal();
+  };
+});
