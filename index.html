@@ -113,7 +113,7 @@
           <section class="quick"><div class="quick-header">⚡ 빠른 업그레이드</div><div class="up-list" id="quickUpgradeList"></div></section>
         </div>
         
-        <section class="panel" style="margin-top:14px;padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><h3 style="margin:0">실시간 랭킹</h3><span style="font-size:.76rem;color:var(--muted);font-weight:700">오늘</span></div><div id="rankingBoard" style="display:grid;gap:8px"></div></section>
+        <section class="panel" style="margin-top:14px;padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><h3 id="rankingBoardTitle" style="margin:0;cursor:pointer;display:flex;align-items:center;gap:6px">실시간 랭킹 <span style="font-size:.75rem;color:var(--muted);font-weight:600">▼</span></h3><span style="font-size:.76rem;color:var(--muted);font-weight:700">오늘</span></div><div id="rankingBoard" style="display:grid;gap:8px"></div></section>
 
         <!-- 오늘의 목표 -->
         <div class="panel" id="dailyGoalsCard" style="margin-top:14px;padding:16px">
@@ -250,6 +250,22 @@
         <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:3px;background:var(--surface2);border:1px solid var(--border);display:inline-block"></span>미출석</span>
       </div>
       <button id="checkinCalClose" style="min-height:42px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);font-weight:700;font-size:.9rem;color:var(--muted)">닫기</button>
+    </div>
+  </div>
+
+  <!-- 랭킹 전체보기 모달 -->
+  <div class="modalbg" id="rankingModal" style="z-index:1500">
+    <div class="modal" style="max-width:400px;gap:14px;padding:22px 18px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong style="color:#7b2845;font-size:1rem">👑 명예의 저축왕</strong>
+        <button id="rankingModalClose" style="width:32px;height:32px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);font-size:1.1rem;display:grid;place-items:center;color:var(--muted)">✕</button>
+      </div>
+      <div id="rankingModalTabBtns" style="display:flex;gap:6px">
+        <button class="rank-tab active" data-tab="daily">일일</button>
+        <button class="rank-tab" data-tab="weekly">주간</button>
+        <button class="rank-tab" data-tab="monthly">월간</button>
+      </div>
+      <div id="rankingModalList" style="display:grid;gap:8px"></div>
     </div>
   </div>
 
