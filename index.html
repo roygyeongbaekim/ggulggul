@@ -931,6 +931,18 @@
         data = { streak:0, lastDate:null, goals:[], goalDate:null, tipClaimed:false, dailyClicks:0, goalsCelebrated:false, rankingSaved:false, checkinDates:[] };
       }
       if(!data.checkinDates) data.checkinDates = [];
+      // 기존 streak 데이터로 checkinDates 백필 (처음 도입 시 과거 날짜 복원)
+      if(data.checkinDates.length === 0 && data.streak > 0 && data.lastDate){
+        for(let i = 0; i < data.streak; i++){
+          const d = new Date(data.lastDate); d.setDate(d.getDate() - i);
+          const ds = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+          if(!data.checkinDates.includes(ds)) data.checkinDates.push(ds);
+        }
+      }
+      // lastDate가 오늘이어도 checkinDates에 오늘이 없으면 추가 (기능 도입 전 접속한 경우 보완)
+      if(data.lastDate === today && !data.checkinDates.includes(today)){
+        data.checkinDates.push(today);
+      }
 
       if(data.lastDate !== today){
         isNewDay = true;
