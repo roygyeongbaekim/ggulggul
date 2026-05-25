@@ -37,7 +37,7 @@
     </section>
 
     <section class="screen" id="gameScreen">
-      <div class="top"><div class="logo" id="gameScreenLogo">꿀꿀 저축챌린지</div><div id="lastLoginDisplay" style="font-size:.72rem;color:var(--muted);font-weight:600;text-align:right;margin-top:2px"></div></div>
+      <div class="top"><div class="logo" id="gameScreenLogo">꿀꿀 저축챌린지</div><button id="checkinCalBtn" title="출석 현황" style="flex-shrink:0;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#fff0f6,#ffd6e8);border:1.5px solid rgba(235,120,155,.35);font-size:1.2rem;display:grid;place-items:center;box-shadow:0 2px 6px rgba(235,120,155,.18)">📅</button><div id="lastLoginDisplay" style="font-size:.72rem;color:var(--muted);font-weight:600;text-align:right;margin-top:2px"></div></div>
       <!--<section class="panel hero"><h1>돼지저금통 금융 클릭 게임</h1><p>클릭할 때 코인이 돼지 입으로 들어가고, 특정 클릭 수에서 금융 퀴즈 이벤트가 등장합니다.</p></section>-->
       <section class="panel main">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;background:linear-gradient(135deg,#fff8ef,#fff3e0);border-radius:16px;margin-bottom:12px;border:1px solid rgba(235,183,45,.25)">
@@ -232,6 +232,23 @@
         <div id="quizCorrectAnswer" style="font-size:.9rem;color:#2d4a2d;font-weight:700;line-height:1.5;padding:8px 12px;background:rgba(76,143,90,.12);border-radius:10px"></div>
       </div>
       <button class="start-btn" id="quizCorrectClose" style="width:100%;min-height:46px">꿀꿀~ 계속하기! 🐷</button>
+    </div>
+  </div>
+
+  <!-- 출석 달력 모달 -->
+  <div class="modalbg" id="checkinCalModal" style="z-index:1400">
+    <div class="modal" style="max-width:380px;gap:14px;padding:22px 18px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <button id="checkinCalPrev" style="width:34px;height:34px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);font-size:1.1rem">‹</button>
+        <strong id="checkinCalTitle" style="font-size:1rem;color:#7b2845"></strong>
+        <button id="checkinCalNext" style="width:34px;height:34px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);font-size:1.1rem">›</button>
+      </div>
+      <div id="checkinCalGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center"></div>
+      <div style="display:flex;gap:10px;justify-content:center;font-size:.75rem;color:var(--muted)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:3px;background:#eb789b;display:inline-block"></span>출석</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:3px;background:var(--surface2);border:1px solid var(--border);display:inline-block"></span>미출석</span>
+      </div>
+      <button id="checkinCalClose" style="min-height:42px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);font-weight:700;font-size:.9rem;color:var(--muted)">닫기</button>
     </div>
   </div>
 
@@ -1144,6 +1161,92 @@
     };
     document.getElementById('quizCorrectClose').onclick=()=>{
       document.getElementById('quizCorrectModal').style.display='none';
+    };
+
+    // ===== 출석 달력 =====
+    let _calViewYear = 0, _calViewMonth = 0;
+    const DAY_LABELS = ['월','화','수','목','금','토','일'];
+
+    function renderCheckinCalendar(){
+      const checkinSet = new Set(state.dailyData?.checkinDates || []);
+      const today = getTodayStr();
+      const y = _calViewYear, m = _calViewMonth;
+      const title = document.getElementById('checkinCalTitle');
+      const grid = document.getElementById('checkinCalGrid');
+      const nextBtn = document.getElementById('checkinCalNext');
+      if(!grid) return;
+
+      const now = new Date();
+      title.textContent = `${y}년 ${m+1}월`;
+      // 다음달 버튼: 현재월 이후는 비활성
+      nextBtn.disabled = (y > now.getFullYear() || (y === now.getFullYear() && m >= now.getMonth()));
+      nextBtn.style.opacity = nextBtn.disabled ? '0.35' : '';
+
+      grid.innerHTML = '';
+      // 요일 헤더 (월~일)
+      DAY_LABELS.forEach(d => {
+        const el = document.createElement('div');
+        el.style.cssText = 'font-size:.7rem;font-weight:700;color:var(--muted);padding:4px 0';
+        el.textContent = d;
+        grid.appendChild(el);
+      });
+
+      // 1일의 요일 (0=일 → 월 기준으로 변환)
+      const firstDay = new Date(y, m, 1).getDay();
+      const offset = firstDay === 0 ? 6 : firstDay - 1;
+      const daysInMonth = new Date(y, m+1, 0).getDate();
+
+      // 빈칸 채우기
+      for(let i = 0; i < offset; i++){
+        grid.appendChild(document.createElement('div'));
+      }
+
+      for(let d = 1; d <= daysInMonth; d++){
+        const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const isToday = dateStr === today;
+        const checked = checkinSet.has(dateStr);
+        const isFuture = dateStr > today;
+        const el = document.createElement('div');
+        el.style.cssText = `
+          aspect-ratio:1/1;border-radius:8px;display:grid;place-items:center;
+          font-size:.8rem;font-weight:${isToday?'900':'700'};
+          background:${checked?'#eb789b':isFuture?'transparent':'var(--surface2)'};
+          color:${checked?'#fff':isFuture?'rgba(0,0,0,.18)':'var(--muted)'};
+          border:${isToday?'2px solid #eb789b':'1px solid '+(isFuture?'transparent':'var(--border)')};
+          position:relative;
+        `;
+        el.textContent = d;
+        if(checked){
+          const ck = document.createElement('span');
+          ck.style.cssText = 'position:absolute;top:1px;right:2px;font-size:.55rem;line-height:1';
+          ck.textContent = '✓';
+          el.appendChild(ck);
+        }
+        grid.appendChild(el);
+      }
+    }
+
+    document.getElementById('checkinCalBtn').onclick = () => {
+      const now = new Date();
+      _calViewYear = now.getFullYear();
+      _calViewMonth = now.getMonth();
+      renderCheckinCalendar();
+      document.getElementById('checkinCalModal').style.display = 'flex';
+    };
+    document.getElementById('checkinCalPrev').onclick = () => {
+      if(_calViewMonth === 0){ _calViewMonth = 11; _calViewYear--; }
+      else _calViewMonth--;
+      renderCheckinCalendar();
+    };
+    document.getElementById('checkinCalNext').onclick = () => {
+      const now = new Date();
+      if(_calViewYear === now.getFullYear() && _calViewMonth >= now.getMonth()) return;
+      if(_calViewMonth === 11){ _calViewMonth = 0; _calViewYear++; }
+      else _calViewMonth++;
+      renderCheckinCalendar();
+    };
+    document.getElementById('checkinCalClose').onclick = () => {
+      document.getElementById('checkinCalModal').style.display = 'none';
     };
 
     // ===== 데이터 초기화 =====
