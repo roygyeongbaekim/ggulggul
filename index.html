@@ -500,15 +500,13 @@
       el.textContent = ts ? '마지막 접속: ' + fmtDatetime(ts) : '';
     }
 
-    async function doLogin(playerId, playerName){
+    async function doLogin(playerId, playerName, prevLogin=null){
       state.playerName = playerName;
       const [fsState, fsDailyData] = await Promise.all([loadPlayerStateFromFs(playerId), loadDailyDataFromFs(playerId)]);
       if(fsState) localStorage.setItem(getPlayerStateKey(), JSON.stringify({...fsState, playerId}));
       if(fsDailyData) localStorage.setItem(getDailyKey(), JSON.stringify(fsDailyData));
       restorePlayerState();
       state.playerId = playerId;
-      const now = Date.now();
-      const prevLogin = fsState?.lastLoginAt || null;
       savePlayerState();
       if(db) db.ref('players/'+safeKey(playerId)).update({name:playerName, playerId, lastLoginAt: TS()}).catch(()=>{});
       fetchAndCacheRanking();
@@ -538,7 +536,7 @@
         const playerData = snap.val();
         const name = playerData.name;
         if(!name) return;
-        await doLogin(pid, name);
+        await doLogin(pid, name, playerData.lastLoginAt||null);
       } catch(e){ console.warn('[AutoLogin] 실패:', e); }
     })();
 
@@ -547,6 +545,7 @@
       const result=validatePlayerName(name);
       if(!result.ok){showNameError(result.msg);playerNameInput.focus();return;}
       clearNameError();
+      state.playerName = name; // peekPlayerId()가 올바른 키를 참조하도록 먼저 세팅
       const btn=$('#startBtn'); btn.disabled=true; btn.textContent='꿀꿀~ 불러오는 중...';
       try {
         let playerId=peekPlayerId();
@@ -554,8 +553,7 @@
         // 이전 접속일시 미리 읽기
         let prevLogin=null;
         if(db){ try{ const ps=await db.ref('players/'+safeKey(playerId)).get(); if(ps.exists()) prevLogin=ps.val().lastLoginAt||null; }catch(e){} }
-        await doLogin(playerId, name);
-        updateLastLoginDisplay(prevLogin);
+        await doLogin(playerId, name, prevLogin);
       } catch(e){
         console.warn('[FS] 로그인 처리 실패, localStorage 폴백:', e);
         restorePlayerState();
