@@ -508,6 +508,7 @@
       restorePlayerState();
       state.playerId = playerId;
       savePlayerState();
+      sessionStorage.setItem('ggul-session-pid', playerId);
       if(db) db.ref('players/'+safeKey(playerId)).update({name:playerName, playerId, lastLoginAt: TS()}).catch(()=>{});
       fetchAndCacheRanking();
       initRoundThresholds();
@@ -520,10 +521,10 @@
       updateUI();
     }
 
-    // URL 파라미터 ?pid=<32자 UUID> 로 접속 시 자동 로그인
+    // 세션 플래그 또는 URL 파라미터 ?pid= 로 자동 로그인
     (async()=>{
       const params = new URLSearchParams(location.search);
-      const pid = params.get('pid');
+      const pid = params.get('pid') || sessionStorage.getItem('ggul-session-pid');
       if(!pid || pid.length < 32) return;
       try {
         if(!db){
@@ -532,10 +533,10 @@
         }
         if(!db) return;
         const snap = await db.ref('players/'+safeKey(pid)).get();
-        if(!snap.exists()) return;
+        if(!snap.exists()){ sessionStorage.removeItem('ggul-session-pid'); return; }
         const playerData = snap.val();
         const name = playerData.name;
-        if(!name) return;
+        if(!name){ sessionStorage.removeItem('ggul-session-pid'); return; }
         await doLogin(pid, name, playerData.lastLoginAt||null);
       } catch(e){ console.warn('[AutoLogin] 실패:', e); }
     })();
