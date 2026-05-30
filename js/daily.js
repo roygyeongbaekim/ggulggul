@@ -123,8 +123,8 @@ function initDailySystem(){
     }
   }
 
-  saveDailyData(data);
   state.dailyData = data;
+  saveDailyData(data);
 
   renderDailyTip();
   renderDailyGoals();
