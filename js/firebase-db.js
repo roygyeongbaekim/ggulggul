@@ -75,6 +75,21 @@ async function findOrCreatePlayer(name){
   } catch(e){ console.warn('[DB] 플레이어 찾기/생성 실패:', e); return null; }
 }
 
+// 이름이 다른 uuid에 이미 사용 중인지 확인 (true = 사용 불가)
+async function checkNameTaken(name, excludeUuid){
+  if(!db) return false;
+  try {
+    const snap = await db.ref('players').orderByChild('name').equalTo(name).limitToFirst(1).get();
+    if(!snap.exists()) return false;
+    let takenByOther = false;
+    snap.forEach(child => {
+      const pid = child.val().playerId;
+      if(pid && safeKey(pid) !== safeKey(excludeUuid)) takenByOther = true;
+    });
+    return takenByOther;
+  } catch(e){ console.warn('[DB] 이름 중복 확인 실패:', e); return false; }
+}
+
 function peekPlayerId(){
   try {
     const ps = JSON.parse(localStorage.getItem('ggul-pstate-'+state.playerName)||'null');

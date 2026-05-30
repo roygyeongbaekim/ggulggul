@@ -8,7 +8,6 @@ async function doLogin(playerId, playerName, prevLogin=null){
   restorePlayerState();
   state.playerId = playerId;
   savePlayerState();
-  sessionStorage.setItem('ggul-session-pid', playerId);
   if(db) db.ref('players/'+safeKey(playerId)).update({name:playerName, playerId, lastLoginAt: TS()}).catch(()=>{});
   fetchAndCacheRanking();
   initRoundThresholds();
@@ -21,24 +20,35 @@ async function doLogin(playerId, playerName, prevLogin=null){
   updateUI();
 }
 
-// 세션 플래그 또는 URL 파라미터 ?pid= 로 자동 로그인
+// ?uuid= 파라미터로 자동 로그인 또는 신규 이름 등록 대기
+let _pendingUuid = null;
+
 (async()=>{
   const params = new URLSearchParams(location.search);
-  const pid = params.get('pid') || sessionStorage.getItem('ggul-session-pid');
-  if(!pid || pid.length < 32) return;
+  const uuid = params.get('uuid');
+  if(!uuid || uuid.length < 32) return;
+
   try {
     if(!db){
       let waited=0;
       await new Promise(res=>{ const t=setInterval(()=>{ waited+=200; if(db||waited>=5000){ clearInterval(t); res(); } },200); });
     }
     if(!db) return;
-    const snap = await db.ref('players/'+safeKey(pid)).get();
-    if(!snap.exists()){ sessionStorage.removeItem('ggul-session-pid'); return; }
-    const playerData = snap.val();
-    const name = playerData.name;
-    if(!name){ sessionStorage.removeItem('ggul-session-pid'); return; }
-    await doLogin(pid, name, playerData.lastLoginAt||null);
-  } catch(e){ console.warn('[AutoLogin] 실패:', e); }
+
+    const snap = await db.ref('players/'+safeKey(uuid)).get();
+    if(snap.exists()){
+      const playerData = snap.val();
+      const name = playerData.name;
+      if(name){
+        // 기존 플레이어 → 바로 게임 진입
+        await doLogin(uuid, name, playerData.lastLoginAt||null);
+        return;
+      }
+    }
+    // 신규 uuid → 이름 입력 대기
+    _pendingUuid = uuid;
+    if(playerNameInput) playerNameInput.focus();
+  } catch(e){ console.warn('[UUID Login] 실패:', e); }
 })();
 
 $('#startBtn').onclick=async()=>{
@@ -46,14 +56,31 @@ $('#startBtn').onclick=async()=>{
   const result=validatePlayerName(name);
   if(!result.ok){showNameError(result.msg);playerNameInput.focus();return;}
   clearNameError();
-  state.playerName = name; // peekPlayerId()가 올바른 키를 참조하도록 먼저 세팅
+
   const btn=$('#startBtn'); btn.disabled=true; btn.textContent='꿀꿀~ 불러오는 중...';
+
   try {
-    let playerId=peekPlayerId();
-    if(!playerId) playerId=await findOrCreatePlayer(name)||generatePlayerId();
-    let prevLogin=null;
-    if(db){ try{ const ps=await db.ref('players/'+safeKey(playerId)).get(); if(ps.exists()) prevLogin=ps.val().lastLoginAt||null; }catch(e){} }
-    await doLogin(playerId, name, prevLogin);
+    if(_pendingUuid){
+      // UUID 파라미터 있고 신규 플레이어 → 이름 중복 확인 후 등록
+      const taken = await checkNameTaken(name, _pendingUuid);
+      if(taken){
+        showNameError('이미 사용 중인 이름이에요. 다른 이름을 입력해주세요 🐷');
+        playerNameInput.focus();
+        btn.disabled=false; btn.textContent='시작하기';
+        return;
+      }
+      state.playerName = name;
+      await db.ref('players/'+safeKey(_pendingUuid)).set({ name, playerId:_pendingUuid, createdAt:TS() });
+      await doLogin(_pendingUuid, name, null);
+    } else {
+      // UUID 파라미터 없음 → 이름 기반 로그인 (기존 방식)
+      state.playerName = name; // peekPlayerId()가 올바른 키를 참조하도록 먼저 세팅
+      let playerId=peekPlayerId();
+      if(!playerId) playerId=await findOrCreatePlayer(name)||generatePlayerId();
+      let prevLogin=null;
+      if(db){ try{ const ps=await db.ref('players/'+safeKey(playerId)).get(); if(ps.exists()) prevLogin=ps.val().lastLoginAt||null; }catch(e){} }
+      await doLogin(playerId, name, prevLogin);
+    }
   } catch(e){
     console.warn('[FS] 로그인 처리 실패, localStorage 폴백:', e);
     restorePlayerState();
