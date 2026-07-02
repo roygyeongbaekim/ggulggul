@@ -200,11 +200,10 @@ function renderQuickUpgrades(){
     btn.disabled = maxed || clickOver;
     btn.innerHTML = `
       <div class="up-icon">${item.icon}</div>
-      <div class="up-name">${item.name}${isRisky ? ' <span class="risk-tag">위험</span>' : ''}</div>
-      <div class="up-desc">${item.desc}</div>
+      <div class="up-name" style="font-size:.9rem">${item.name}${isRisky ? ' <span class="risk-tag">위험</span>' : ''}</div>
       <div class="up-bar-wrap"><div class="up-bar-fill" style="width:${pct}%"></div></div>
-      <div class="up-count">${maxed ? '🔒 완료' : `${item.bought}/${UPGRADE_MAX_COUNT}회`}</div>
-      <div class="up-cost">${maxed ? '—' : formatMoney(item.cost)}</div>`;
+      <div class="up-count" style="font-size:.76rem">${maxed ? '🔒 완료' : `${item.bought}/${UPGRADE_MAX_COUNT}`}</div>
+      <div class="up-cost" style="font-size:.88rem">${maxed ? '—' : formatMoney(item.cost)}</div>`;
     btn.onclick = () => buyUpgrade(index);
     quickUpgradeList.appendChild(btn);
   });
