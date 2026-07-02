@@ -9,7 +9,7 @@
   <title>꿀꿀 저축챌린지</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap">
-  <link rel="stylesheet" href="style.css?v=20260530000000">
+  <link rel="stylesheet" href="style.css?v=20260702130000">
 </head>
 <body>
   <div class="app">
@@ -37,30 +37,29 @@
     </section>
 
     <section class="screen" id="gameScreen">
-      <div class="top"><div class="logo" id="gameScreenLogo">꿀꿀 저축챌린지</div><div id="lastLoginDisplay" style="font-size:.72rem;color:var(--muted);font-weight:600;text-align:right;margin-top:2px"></div></div>
       <!--<section class="panel hero"><h1>돼지저금통 금융 클릭 게임</h1><p>클릭할 때 코인이 돼지 입으로 들어가고, 특정 클릭 수에서 금융 퀴즈 이벤트가 등장합니다.</p></section>-->
       <section class="panel main">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;background:linear-gradient(135deg,#fff8ef,#fff3e0);border-radius:16px;margin-bottom:12px;border:1px solid rgba(235,183,45,.25)">
-          <div style="display:flex;align-items:center;gap:7px">
+        <div style="display:flex;gap:10px;margin-bottom:14px;align-items:stretch">
+          <div style="flex-shrink:0;padding:10px 14px;background:linear-gradient(135deg,#fff8ef,#fff3e0);border-radius:18px;border:1px solid rgba(235,183,45,.25);display:flex;align-items:center;gap:7px">
             <span style="font-size:1.35rem">📊</span>
             <div>
               <div style="font-size:.75rem;color:#7b5a00;font-weight:700">재무 점수</div>
               <div style="font-size:1.55rem;font-weight:900;color:#7b2845;line-height:1" id="score">0</div>
             </div>
           </div>
-          <button id="checkinCalBtn" title="출석 현황" style="flex-shrink:0;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#fff0f6,#ffd6e8);border:1.5px solid rgba(235,120,155,.35);font-size:1.2rem;display:grid;place-items:center;box-shadow:0 2px 6px rgba(235,120,155,.18)">📅</button>
-          <div style="display:flex;align-items:center;gap:10px">
-            <button id="tipIconBtn" title="오늘의 금융 팁" style="position:relative;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#fff3c4,#ffe066);border:1.5px solid rgba(200,155,0,.3);font-size:1.3rem;display:grid;place-items:center;box-shadow:0 2px 6px rgba(200,150,0,.15);cursor:pointer;flex-shrink:0;transition:background .25s,opacity .25s">
-              <span id="tipIconEmoji">💡</span>
-              <span id="tipDotIndicator" style="display:none;position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#e53e3e;border:1.5px solid #fff"></span>
-            </button>
-            <div style="text-align:right">
-              <div style="font-size:.75rem;color:var(--muted);font-weight:700">콤보</div>
-              <div style="font-size:1.3rem;font-weight:900;color:#e86c00" id="comboDisplay">×1.0</div>
+          <div class="money" style="flex:1;margin-bottom:0;position:relative">
+            <div style="display:flex;align-items:center;justify-content:center;gap:5px;color:var(--muted);font-size:.82rem;font-weight:700;margin-bottom:2px"><span>💰</span><span>오늘의 저축</span></div>
+            <div class="value" id="money">₩0</div>
+            <div class="meta">
+              <span>클릭 수익 <strong id="clickIncome" style="color:#e86c00">₩10</strong></span>
+              <span>콤보 <strong id="comboDisplay" style="color:#e86c00;font-weight:900">×1.0</strong></span>
             </div>
+            <button id="tipIconBtn" title="오늘의 금융 팁" style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#fff3c4,#ffe066);border:1.5px solid rgba(200,155,0,.3);font-size:1rem;display:grid;place-items:center;box-shadow:0 2px 6px rgba(200,150,0,.15);cursor:pointer;transition:background .25s,opacity .25s">
+              <span id="tipIconEmoji">💡</span>
+              <span id="tipDotIndicator" style="display:none;position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:#e53e3e;border:1.5px solid #fff"></span>
+            </button>
           </div>
         </div>
-        <div class="money"><div style="display:flex;align-items:center;justify-content:center;gap:5px;color:var(--muted);font-size:.82rem;font-weight:700;margin-bottom:2px"><span>💰</span><span>오늘의 저축</span></div><div class="value" id="money">₩0</div><div class="meta"><span>클릭 수익 <strong id="clickIncome" style="color:#e86c00">₩10</strong></span></div></div>
         <div class="tap-area">
           <div class="tap-wrap">
             <div id="tapDoneOverlay" style="display:none;position:absolute;top:15%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:10;pointer-events:none;width:min(300px,85vw)">
@@ -110,7 +109,7 @@
               <div id="resultSavedMsg" style="display:none;margin-top:8px;font-size:.8rem;color:var(--success);font-weight:700">✅ 랭킹에 저장됐어요!</div>
             </div>
           </div>
-          <section class="quick"><div class="quick-header">⚡ 빠른 업그레이드</div><div class="up-list" id="quickUpgradeList"></div></section>
+          <section class="quick"><div class="quick-header" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>⚡ 빠른 업그레이드</span><div style="display:flex;align-items:center;gap:6px"><button id="checkinCalBtn" title="출석 현황" style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#fff0f6,#ffd6e8);border:1.5px solid rgba(235,120,155,.35);font-size:.85rem;display:grid;place-items:center;box-shadow:0 1px 4px rgba(235,120,155,.18);padding:0;cursor:pointer">📅</button><div class="logo" id="gameScreenLogo" style="font-size:.85rem;font-weight:800;white-space:nowrap"></div></div></div><div class="up-list" id="quickUpgradeList"></div></section>
         </div>
         
         <section class="panel" style="margin-top:14px;padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><button id="rankingBoardTitle" style="margin:0;padding:0;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:700;color:inherit;font-family:inherit">실시간 랭킹 <span style="font-size:.75rem;color:var(--muted);font-weight:600">▼</span></button><span style="font-size:.76rem;color:var(--muted);font-weight:700">오늘</span></div><div id="rankingBoard" style="display:grid;gap:8px"></div></section>
@@ -289,8 +288,8 @@
   <script src="js/ranking.js?v=20260530000000"></script>
   <script src="js/player.js?v=20260530000000"></script>
   <script src="js/daily.js?v=20260530000000"></script>
-  <script src="js/game.js?v=20260530000000"></script>
-  <script src="js/ui.js?v=20260530000000"></script>
+  <script src="js/game.js?v=20260702120000"></script>
+  <script src="js/ui.js?v=20260702120000"></script>
   <script src="js/app.js?v=20260530000000"></script>
 </body>
 </html>
