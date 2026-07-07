@@ -114,3 +114,16 @@ window.clearAllGameData = function(target){
 
 loadQuizData().then(()=>{ updateUI(); renderRanking(); });
 fetchAndCacheRanking(true);
+
+// bfcache 복원(브라우저 뒤로가기) 감지 → 인트로 화면으로 초기화
+window.addEventListener('pageshow', e => {
+  if(!e.persisted) return;
+  // 이전 플레이어 state 메모리 초기화 (localStorage는 보존)
+  state.playerName = '플레이어';
+  state.playerId = null;
+  state.money = 0; state.clickIncome = 10; state.tapCount = 0;
+  state.upgradeCount = 0; state.score = 0; state.bestCombo = 0;
+  state.combo = 0; state.comboMult = 1;
+  state.dailyData = null;
+  switchScreen('#introScreen');
+});

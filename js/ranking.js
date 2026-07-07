@@ -8,6 +8,9 @@ let _rankingLoading = true;
 function getWeekStart(){ const d=new Date(); const day=d.getDay(); const diff=day===0?6:day-1; d.setDate(d.getDate()-diff); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function getMonthPrefix(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
 
+// 복합 랭킹 점수: 저축금액 × (1 + 재무점수 / 1000)
+function calcRankScore(item){ return Math.floor((item.money||0) * (1 + (item.score||0) / 1000)); }
+
 function aggregateRanking(items){
   const map={};
   items.forEach(i=>{
@@ -17,7 +20,7 @@ function aggregateRanking(items){
     map[key].money += (i.money||0);
     if(i.date && i.date > map[key].date) map[key].date = i.date;
   });
-  return Object.values(map).sort((a,b)=>(b.score-a.score)||(b.money-a.money)).slice(0,5);
+  return Object.values(map).sort((a,b)=>calcRankScore(b)-calcRankScore(a)).slice(0,5);
 }
 
 function fmtRankDate(d){ return d ? d.replace(/-/g,'.') : ''; }
@@ -28,7 +31,7 @@ function showRankingLoading(){
 
 function rebuildRankingCache(){
   const today=getTodayStr(); const weekStart=getWeekStart(); const monthPrefix=getMonthPrefix();
-  const sortFn=(a,b)=>(b.score-a.score)||(b.money-a.money);
+  const sortFn=(a,b)=>calcRankScore(b)-calcRankScore(a);
   _rankingCacheByTab.daily=_allRankingItems.filter(i=>i.date===today).sort(sortFn).slice(0,5);
   _rankingCacheByTab.weekly=aggregateRanking(_allRankingItems.filter(i=>i.date&&i.date>=weekStart));
   _rankingCacheByTab.monthly=aggregateRanking(_allRankingItems.filter(i=>i.date&&i.date.startsWith(monthPrefix)));
@@ -88,15 +91,18 @@ function renderRankList(container, list, showMeBadge, showDate){
     return;
   }
   const me=(state.playerName||'').trim();
+  const maskName=name=>{ if(!name) return '?'; const chars=[...name]; if(chars.length===1) return '*'; if(chars.length===2) return chars[0]+'*'; return chars[0]+'*'.repeat(chars.length-2)+chars[chars.length-1]; };
   list.forEach((item,idx)=>{
     const isMe=showMeBadge&&me&&item.name===me;
+    const displayName=isMe?item.name:maskName(item.name);
     const row=document.createElement('div');
     row.className='rank-row'+(isMe?' rank-row-me':'');
     const medals=['🥇','🥈','🥉'];
     const badgeClass=idx<3?`medal-${idx+1}`:'medal-n';
     const badgeContent=idx<3?medals[idx]:idx+1;
     const dateTag=(showDate&&item.date)?` <span style="font-size:.72rem;color:var(--muted);font-weight:600">(${fmtRankDate(item.date)})</span>`:'';
-    row.innerHTML=`<div class="rank-badge ${badgeClass}">${badgeContent}</div><div><div class="rank-name">${item.name}${isMe?' <span class="rank-me-badge">나</span>':''}${dateTag}</div><div class="rank-meta">점수 ${item.score.toLocaleString('ko-KR')} · 자산 ${formatMoney(item.money)}</div></div>`;
+    const combined=calcRankScore(item);
+    row.innerHTML=`<div class="rank-badge ${badgeClass}">${badgeContent}</div><div style="flex:1;min-width:0"><div class="rank-name">${displayName}${isMe?' <span class="rank-me-badge">나</span>':''}${dateTag}</div><div class="rank-meta">재무 ${item.score.toLocaleString('ko-KR')} · 저축 ${formatMoney(item.money)}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-size:.8rem;font-weight:900;color:#7b2845">${combined.toLocaleString('ko-KR')}</div><div style="font-size:.65rem;color:var(--muted);font-weight:600">종합점수</div></div>`;
     container.appendChild(row);
   });
 }
@@ -137,6 +143,17 @@ function openRankingModal(){
 }
 
 document.getElementById('rankingBoardTitle').onclick = openRankingModal;
+
+// 종합점수 산정방식 툴팁 토글
+function setupScoreInfoBtn(btnId, tooltipId){
+  const btn = document.getElementById(btnId);
+  const tip = document.getElementById(tooltipId);
+  if(!btn||!tip) return;
+  btn.addEventListener('click', e => { e.stopPropagation(); tip.classList.toggle('show'); });
+  document.addEventListener('click', () => tip.classList.remove('show'));
+}
+setupScoreInfoBtn('rankScoreInfoBtn', 'rankScoreTooltip');
+setupScoreInfoBtn('rankScoreInfoBtnModal', 'rankScoreTooltipModal');
 
 document.getElementById('rankingModalClose').onclick = () => {
   document.getElementById('rankingModal').style.display = 'none';

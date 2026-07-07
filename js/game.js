@@ -18,7 +18,7 @@ function resumeCombo(){
   state._comboPauseRemaining=0;
 }
 
-async function loadQuizData(){ try{ const res=await fetch('./v10-full.json'); state.quizData=await res.json(); } catch(e){ state.quizData={easy:[],normal:[],hard:[]}; } }
+async function loadQuizData(){ try{ const res=await fetch('./js/quizData.js'); state.quizData=await res.json(); } catch(e){ state.quizData={easy:[],normal:[],hard:[]}; } }
 
 function showEventModal(quiz, roundKey){
   pauseCombo();
