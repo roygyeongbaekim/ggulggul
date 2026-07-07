@@ -20,13 +20,15 @@ async function doLogin(playerId, playerName, prevLogin=null){
   updateUI();
 }
 
-// ?uuid= 파라미터로 자동 로그인 또는 신규 이름 등록 대기
+// ===== Case 1: ?uuid= 파라미터가 있을 때 =====
+// - DB에 등록된 uuid → 해당 플레이어 정보로 게임화면 바로 진입
+// - DB에 없는 uuid → 인트로 화면 유지, 이름 입력 대기
 let _pendingUuid = null;
 
 (async()=>{
   const params = new URLSearchParams(location.search);
   const uuid = params.get('uuid');
-  if(!uuid || uuid.length < 32) return;
+  if(!uuid || uuid.length < 32) return; // Case 2: uuid 없으면 인트로 화면 그대로
 
   try {
     if(!db){
@@ -36,55 +38,52 @@ let _pendingUuid = null;
     if(!db) return;
 
     const snap = await db.ref('players/'+safeKey(uuid)).get();
-    if(snap.exists()){
+    if(snap.exists() && snap.val().name){
+      // DB에 등록된 uuid → 바로 게임 진입
       const playerData = snap.val();
-      const name = playerData.name;
-      if(name){
-        // 기존 플레이어 → 바로 게임 진입
-        await doLogin(uuid, name, playerData.lastLoginAt||null);
-        return;
-      }
+      await doLogin(uuid, playerData.name, playerData.lastLoginAt||null);
+      return;
     }
-    // 신규 uuid → 이름 입력 대기
+    // DB에 없는 uuid → 인트로 화면에서 이름 입력 대기
     _pendingUuid = uuid;
     if(playerNameInput) playerNameInput.focus();
   } catch(e){ console.warn('[UUID Login] 실패:', e); }
 })();
 
-$('#startBtn').onclick=async()=>{
-  const name=(playerNameInput?.value||'').trim();
-  const result=validatePlayerName(name);
-  if(!result.ok){showNameError(result.msg);playerNameInput.focus();return;}
+// ===== 시작하기 버튼 =====
+$('#startBtn').onclick = async () => {
+  const name = (playerNameInput?.value||'').trim();
+  const result = validatePlayerName(name);
+  if(!result.ok){ showNameError(result.msg); playerNameInput.focus(); return; }
   clearNameError();
 
-  const btn=$('#startBtn'); btn.disabled=true; btn.textContent='꿀꿀~ 불러오는 중...';
+  const btn = $('#startBtn'); btn.disabled=true; btn.textContent='꿀꿀~ 불러오는 중...';
 
   try {
     if(_pendingUuid){
-      // UUID 파라미터 있고 신규 플레이어 → 이름 중복 확인 후 등록
+      // Case 1 - 신규 uuid: 이름 중복 확인 후 등록
       const taken = await checkNameTaken(name, _pendingUuid);
       if(taken){
-        showNameError('이미 사용 중인 이름이에요. 다른 이름을 입력해주세요 🐷');
+        showNameError('이미 등록된 닉네임이에요. 다른 이름을 입력해주세요 🐷');
         playerNameInput.focus();
         btn.disabled=false; btn.textContent='시작하기';
         return;
       }
-      state.playerName = name;
       await db.ref('players/'+safeKey(_pendingUuid)).set({ name, playerId:_pendingUuid, createdAt:TS() });
       await doLogin(_pendingUuid, name, null);
     } else {
-      // UUID 파라미터 없음 → 이름 기반 로그인 (기존 방식)
-      state.playerName = name; // peekPlayerId()가 올바른 키를 참조하도록 먼저 세팅
-      let playerId=peekPlayerId();
-      if(!playerId) playerId=await findOrCreatePlayer(name)||generatePlayerId();
-      let prevLogin=null;
-      if(db){ try{ const ps=await db.ref('players/'+safeKey(playerId)).get(); if(ps.exists()) prevLogin=ps.val().lastLoginAt||null; }catch(e){} }
-      await doLogin(playerId, name, prevLogin);
+      // Case 2 - uuid 없음: 이름으로 기존 플레이어 조회 → 있으면 해당 정보로 진입, 없으면 신규 등록
+      const existingId = await findOrCreatePlayer(name);
+      let prevLogin = null;
+      if(db && existingId){
+        try { const ps = await db.ref('players/'+safeKey(existingId)).get(); if(ps.exists()) prevLogin = ps.val().lastLoginAt||null; } catch(e){}
+      }
+      await doLogin(existingId || generatePlayerId(), name, prevLogin);
     }
   } catch(e){
     console.warn('[FS] 로그인 처리 실패, localStorage 폴백:', e);
     restorePlayerState();
-    if(!state.playerId){state.playerId=generatePlayerId();savePlayerState();}
+    if(!state.playerId){ state.playerId=generatePlayerId(); savePlayerState(); }
     initRoundThresholds();
     switchScreen('#gameScreen');
     const logo=$('#gameScreenLogo'); if(logo) logo.textContent=(name||'플레이어')+'의 저축';
@@ -118,12 +117,12 @@ fetchAndCacheRanking(true);
 // bfcache 복원(브라우저 뒤로가기) 감지 → 인트로 화면으로 초기화
 window.addEventListener('pageshow', e => {
   if(!e.persisted) return;
-  // 이전 플레이어 state 메모리 초기화 (localStorage는 보존)
   state.playerName = '플레이어';
   state.playerId = null;
   state.money = 0; state.clickIncome = 10; state.tapCount = 0;
   state.upgradeCount = 0; state.score = 0; state.bestCombo = 0;
   state.combo = 0; state.comboMult = 1;
   state.dailyData = null;
+  _pendingUuid = null;
   switchScreen('#introScreen');
 });

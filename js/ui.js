@@ -13,16 +13,9 @@ function validatePlayerName(name){
   const lower = name.toLowerCase().replace(/\s/g,'');
   for(const w of BAD_WORDS){ if(lower.includes(w)) return { ok:false, msg:'사용할 수 없는 단어가 포함되어 있어요 ⚠️' }; }
   if(/[<>"'`;&|\\\/]/.test(name)) return { ok:false, msg:'사용할 수 없는 특수문자가 포함되어 있어요' };
-  const hasKorean = /[가-힣ㄱ-ㅎㅏ-ㅣ]/.test(name);
-  const hasEnglish = /[a-zA-Z]/.test(name);
-  const hasNumber = /[0-9]/.test(name);
-  if(hasKorean && !hasEnglish && !hasNumber){
-    if(name.length < 3) return { ok:false, msg:'한글 이름은 최소 3자 이상 입력해주세요' };
-  } else if(hasEnglish && !hasKorean && !hasNumber){
-    if(name.length < 6) return { ok:false, msg:'영문 이름은 최소 6자 이상 입력해주세요' };
-  } else {
-    if(name.length < 5) return { ok:false, msg:'이름은 최소 5자 이상 입력해주세요' };
-  }
+  const len = [...name].length;
+  if(len < 3) return { ok:false, msg:'이름은 최소 3자 이상 입력해주세요 🐷' };
+  if(len > 12) return { ok:false, msg:'이름은 최대 12자까지 입력할 수 있어요 🐷' };
   return { ok:true };
 }
 

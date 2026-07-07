@@ -194,16 +194,15 @@ function renderQuickUpgrades(){
     const clickOver = !!(state.dailyData && state.dailyData.dailyClicks >= DAILY_CLICK_LIMIT);
     const canAfford = state.money >= item.cost;
     const isRisky = item.type === 'risky';
-    const pct = Math.round((item.bought / UPGRADE_MAX_COUNT) * 100);
     const btn = document.createElement('button');
     btn.className = 'up' + (maxed ? ' maxed' : clickOver ? ' maxed' : isRisky ? ' risky' + (canAfford ? ' aff' : '') : canAfford ? ' aff' : '');
     btn.disabled = maxed || clickOver;
     btn.innerHTML = `
-      <div class="up-icon">${item.icon}</div>
-      <div class="up-name" style="font-size:.9rem">${item.name}${isRisky ? ' <span class="risk-tag">위험</span>' : ''}</div>
-      <div class="up-bar-wrap"><div class="up-bar-fill" style="width:${pct}%"></div></div>
-      <div class="up-count" style="font-size:.76rem">${maxed ? '🔒 완료' : `${item.bought}/${UPGRADE_MAX_COUNT}`}</div>
-      <div class="up-cost" style="font-size:.88rem">${maxed ? '—' : formatMoney(item.cost)}</div>`;
+      <div class="up-icon-row">
+        <div class="up-icon">${item.icon}${isRisky ? '<span class="risk-dot"></span>' : ''}</div>
+        <div class="up-count-badge">${maxed ? '✓' : `${item.bought}/${UPGRADE_MAX_COUNT}`}</div>
+      </div>
+      <div class="up-cost">${maxed ? '완료' : formatMoney(item.cost)}</div>`;
     btn.onclick = () => buyUpgrade(index);
     quickUpgradeList.appendChild(btn);
   });
