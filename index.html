@@ -112,7 +112,7 @@
           <section class="quick"><div class="quick-header" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>⚡ 빠른 업그레이드</span><div style="display:flex;align-items:center;gap:6px"><button id="checkinCalBtn" title="출석 현황" style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#fff0f6,#ffd6e8);border:1.5px solid rgba(235,120,155,.35);font-size:.85rem;display:grid;place-items:center;box-shadow:0 1px 4px rgba(235,120,155,.18);padding:0;cursor:pointer">📅</button><div class="logo" id="gameScreenLogo" style="font-size:.85rem;font-weight:800;white-space:nowrap"></div></div></div><div class="up-list" id="quickUpgradeList"></div></section>
         </div>
         
-        <section class="panel" style="margin-top:14px;padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><button id="rankingBoardTitle" style="margin:0;padding:0;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:700;color:inherit;font-family:inherit">실시간 랭킹 <span style="font-size:.75rem;color:var(--muted);font-weight:600">▼</span></button><span style="font-size:.76rem;color:var(--muted);font-weight:700">오늘</span></div><div id="rankingBoard" style="display:grid;gap:8px"></div></section>
+        <section class="panel" style="margin-top:14px;padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><div style="display:flex;align-items:center;gap:6px"><button id="rankingBoardTitle" style="margin:0;padding:0;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:700;color:inherit;font-family:inherit">실시간 랭킹 <span style="font-size:.75rem;color:var(--muted);font-weight:600">▼</span></button><div style="position:relative;display:inline-flex"><button class="rank-score-info-btn" id="rankScoreInfoBtn" title="산정 방식">?</button><div class="rank-score-tooltip" id="rankScoreTooltip">📊 <strong>종합점수 산정 방식</strong><br>저축금액 × (1 + 재무점수 ÷ 1000)<br><span style="font-size:.72rem;color:var(--muted)">예) 저축 ₩50,000 + 재무점수 500<br>= 50,000 × 1.5 = <strong>75,000점</strong></span></div></div></div><span style="font-size:.76rem;color:var(--muted);font-weight:700">오늘</span></div><div id="rankingBoard" style="display:grid;gap:8px"></div></section>
 
         <!-- 오늘의 목표 -->
         <div class="panel" id="dailyGoalsCard" style="margin-top:14px;padding:16px">
@@ -256,7 +256,10 @@
   <div class="modalbg" id="rankingModal" style="z-index:1500">
     <div class="modal" style="max-width:400px;gap:14px;padding:22px 18px">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <strong style="color:#7b2845;font-size:1rem">👑 명예의 저축왕</strong>
+        <div style="display:flex;align-items:center;gap:7px">
+          <strong style="color:#7b2845;font-size:1rem">👑 명예의 저축왕</strong>
+          <div style="position:relative;display:inline-flex"><button class="rank-score-info-btn" id="rankScoreInfoBtnModal" title="산정 방식">?</button><div class="rank-score-tooltip" id="rankScoreTooltipModal">📊 <strong>종합점수 산정 방식</strong><br>저축금액 × (1 + 재무점수 ÷ 1000)<br><span style="font-size:.72rem;color:var(--muted)">예) 저축 ₩50,000 + 재무점수 500<br>= 50,000 × 1.5 = <strong>75,000점</strong></span></div></div>
+        </div>
         <button id="rankingModalClose" style="width:32px;height:32px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);font-size:1.1rem;display:grid;place-items:center;color:var(--muted)">✕</button>
       </div>
       <div id="rankingModalTabBtns" style="display:flex;gap:6px">
@@ -285,11 +288,11 @@
   <script src="js/data.js?v=20260530000000"></script>
   <script src="js/state.js?v=20260530000000"></script>
   <script src="js/firebase-db.js?v=20260530000000"></script>
-  <script src="js/ranking.js?v=20260530000000"></script>
+  <script src="js/ranking.js?v=20260708010000"></script>
   <script src="js/player.js?v=20260530000000"></script>
   <script src="js/daily.js?v=20260530000000"></script>
-  <script src="js/game.js?v=20260702120000"></script>
-  <script src="js/ui.js?v=20260702120000"></script>
-  <script src="js/app.js?v=20260530000000"></script>
+  <script src="js/game.js?v=20260708000000"></script>
+  <script src="js/ui.js?v=20260707000000"></script>
+  <script src="js/app.js?v=20260707000000"></script>
 </body>
 </html>
