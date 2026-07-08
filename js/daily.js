@@ -114,6 +114,10 @@ function initDailySystem(){
     state.money = 0; state.score = 0; state.tapCount = 0; state.bestCombo = 0;
     state.clickIncome = 10; state.combo = 0; state.comboMult = 1;
     resetUpgrades();
+    // 연속 출석 보너스: 최대 5일(+20원), 최대 시작 저축 +2000원
+    const _sb = Math.min(Math.max(data.streak - 1, 0), 4);
+    state.clickIncome = 10 + _sb * 5;
+    state.money = _sb * 500;
     savePlayerState();
   } else {
     if(!data.goals || data.goals.length === 0){
@@ -293,7 +297,16 @@ function showCheckinModal(data){
   subtitleEl.textContent = msg;
   bonusAmountEl.textContent = '+' + formatMoney(bonus);
   bonusDescEl.textContent = s + '일 연속 출석 보너스';
-  nextTipEl.textContent = s < 7 ? '💰 ' + (7 - s) + '일 더 연속 출석하면 ₩5,000 특별 보너스!' : '🎉 연속 출석을 계속 유지해 보세요!';
+  const _sb = Math.min(Math.max(s - 1, 0), 4);
+  const _clickBonus = _sb * 5;
+  const _moneyBonus = _sb * 500;
+  if(s === 1){
+    nextTipEl.textContent = '💡 내일도 출석하면 클릭수익 +₩5 · 시작저축 +₩500 보너스!';
+  } else if(_sb >= 4){
+    nextTipEl.textContent = '🎉 최대 연속 보너스! 클릭수익 +₩' + _clickBonus + ' · 시작저축 +₩' + _moneyBonus.toLocaleString('ko-KR') + ' 적용 중!';
+  } else {
+    nextTipEl.textContent = '🔥 연속 보너스 적용 중! 클릭수익 +₩' + _clickBonus + ' · 시작저축 +₩' + _moneyBonus.toLocaleString('ko-KR');
+  }
 
   const checkinSet = new Set(data.checkinDates||[]);
   calendarEl.innerHTML = '';
