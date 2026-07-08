@@ -175,6 +175,22 @@ button{font:inherit;border:0;background:none;color:inherit;cursor:pointer}
 .rank-tab{padding:5px 14px;border-radius:999px;border:1.5px solid var(--border);background:var(--surface2);font-size:.8rem;font-weight:800;color:var(--muted);cursor:pointer;transition:background .15s,color .15s,border-color .15s}
 .rank-tab.active{background:linear-gradient(135deg,#eb789b,#d85b84);color:#fff;border-color:transparent;box-shadow:0 3px 8px rgba(216,91,132,.28)}
 
+/* === 코치마크 === */
+#coachMark{position:fixed;inset:0;z-index:2800;pointer-events:none}
+#coachOverlay{position:fixed;inset:0;background:rgba(0,0,0,.65);pointer-events:all}
+#coachHighlight{position:fixed;z-index:2810;border-radius:14px;outline:3px solid rgba(255,255,255,.8);outline-offset:2px;pointer-events:none;transition:top .32s ease,left .32s ease,width .32s ease,height .32s ease;box-shadow:0 0 0 9999px transparent}
+@keyframes coachPulse{0%,100%{outline-color:rgba(255,255,255,.8)}50%{outline-color:rgba(235,120,155,.9)}}
+#coachHighlight{animation:coachPulse 1.8s ease-in-out infinite}
+#coachBubble{position:fixed;z-index:2820;background:#fff;border-radius:20px;padding:18px 20px 16px;width:min(300px,86vw);box-shadow:0 8px 32px rgba(0,0,0,.28);pointer-events:all;transition:top .32s ease,left .32s ease}
+#coachArrowEl{position:absolute;width:0;height:0;pointer-events:none}
+#coachArrowEl.arrow-up{border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:14px solid #fff;top:-14px}
+#coachArrowEl.arrow-down{border-left:12px solid transparent;border-right:12px solid transparent;border-top:14px solid #fff;bottom:-14px}
+#coachStepIndicator{font-size:.72rem;font-weight:800;color:var(--primary);margin-bottom:6px;letter-spacing:.04em}
+#coachTitle{font-size:1rem;font-weight:900;color:#2a2222;margin-bottom:6px;line-height:1.4}
+#coachDesc{font-size:.84rem;color:var(--muted);font-weight:600;line-height:1.65;white-space:pre-line}
+#coachSkipBtn{background:none;border:none;font-size:.8rem;color:var(--muted);cursor:pointer;padding:0;font-weight:700;text-decoration:underline}
+#coachNextBtn{background:linear-gradient(135deg,#eb789b,#d85b84);color:#fff;border:none;border-radius:999px;padding:9px 22px;font-size:.9rem;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(235,120,155,.4)}
+
 /* === 저축금액 플로팅 텍스트 === */
 .money-float{position:fixed;font-weight:900;font-size:1.1rem;pointer-events:none;z-index:3000;animation:moneyFloat .95s ease-out forwards;white-space:nowrap}
 @keyframes moneyFloat{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-64px)}}

@@ -40,7 +40,7 @@
       <!--<section class="panel hero"><h1>돼지저금통 금융 클릭 게임</h1><p>클릭할 때 코인이 돼지 입으로 들어가고, 특정 클릭 수에서 금융 퀴즈 이벤트가 등장합니다.</p></section>-->
       <section class="panel main">
         <div style="display:flex;gap:10px;margin-bottom:14px;align-items:stretch">
-          <div style="flex-shrink:0;padding:10px 14px;background:linear-gradient(135deg,#fff8ef,#fff3e0);border-radius:18px;border:1px solid rgba(235,183,45,.25);display:flex;align-items:center;gap:7px">
+          <div id="scoreBox" style="flex-shrink:0;padding:10px 14px;background:linear-gradient(135deg,#fff8ef,#fff3e0);border-radius:18px;border:1px solid rgba(235,183,45,.25);display:flex;align-items:center;gap:7px">
             <span style="font-size:1.35rem">📊</span>
             <div>
               <div style="font-size:.75rem;color:#7b5a00;font-weight:700">재무 점수</div>
@@ -109,7 +109,7 @@
               <div id="resultSavedMsg" style="display:none;margin-top:8px;font-size:.8rem;color:var(--success);font-weight:700">✅ 랭킹에 저장됐어요!</div>
             </div>
           </div>
-          <section class="quick"><div class="quick-header" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>⚡ 빠른 업그레이드</span><div style="display:flex;align-items:center;gap:6px"><button id="checkinCalBtn" title="출석 현황" style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#fff0f6,#ffd6e8);border:1.5px solid rgba(235,120,155,.35);font-size:.85rem;display:grid;place-items:center;box-shadow:0 1px 4px rgba(235,120,155,.18);padding:0;cursor:pointer">📅</button><div class="logo" id="gameScreenLogo" style="font-size:.85rem;font-weight:800;white-space:nowrap"></div></div></div><div class="up-list" id="quickUpgradeList"></div></section>
+          <section class="quick"><div class="quick-header" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>⚡ 빠른 업그레이드</span><div style="display:flex;align-items:center;gap:6px"><button id="coachRestartBtn" title="게임 가이드 보기" style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#f0f4ff,#dce8ff);border:1.5px solid rgba(99,130,235,.35);font-size:.8rem;display:grid;place-items:center;box-shadow:0 1px 4px rgba(99,130,235,.18);padding:0;cursor:pointer;font-weight:900;color:#4a6fd4">?▶</button><button id="checkinCalBtn" title="출석 현황" style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#fff0f6,#ffd6e8);border:1.5px solid rgba(235,120,155,.35);font-size:.85rem;display:grid;place-items:center;box-shadow:0 1px 4px rgba(235,120,155,.18);padding:0;cursor:pointer">📅</button><div class="logo" id="gameScreenLogo" style="font-size:.85rem;font-weight:800;white-space:nowrap"></div></div></div><div class="up-list" id="quickUpgradeList"></div></section>
         </div>
         
         <section class="panel" style="margin-top:14px;padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><div style="display:flex;align-items:center;gap:6px"><button id="rankingBoardTitle" style="margin:0;padding:0;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:700;color:inherit;font-family:inherit">실시간 랭킹 <span style="font-size:.75rem;color:var(--muted);font-weight:600">▼</span></button><div style="position:relative;display:inline-flex"><button class="rank-score-info-btn" id="rankScoreInfoBtn" title="산정 방식">?</button><div class="rank-score-tooltip" id="rankScoreTooltip">📊 <strong>종합점수 산정 방식</strong><br>저축금액 × (1 + 재무점수 ÷ 1000)<br><span style="font-size:.72rem;color:var(--muted)">예) 저축 ₩50,000 + 재무점수 500<br>= 50,000 × 1.5 = <strong>75,000점</strong></span></div></div></div><span style="font-size:.76rem;color:var(--muted);font-weight:700">오늘</span></div><div id="rankingBoard" style="display:grid;gap:8px"></div></section>
@@ -271,6 +271,22 @@
     </div>
   </div>
 
+  <!-- 코치마크 -->
+  <div id="coachMark" style="display:none">
+    <div id="coachOverlay"></div>
+    <div id="coachHighlight"></div>
+    <div id="coachBubble">
+      <div id="coachArrowEl"></div>
+      <div id="coachStepIndicator"></div>
+      <div id="coachTitle"></div>
+      <div id="coachDesc"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
+        <button id="coachSkipBtn">건너뛰기</button>
+        <button id="coachNextBtn">다음 →</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
@@ -285,14 +301,14 @@
   </script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-  <script src="js/data.js?v=20260530000000"></script>
+  <script src="js/data.js?v=20260708090000"></script>
   <script src="js/state.js?v=20260530000000"></script>
   <script src="js/firebase-db.js?v=20260530000000"></script>
   <script src="js/ranking.js?v=20260708010000"></script>
   <script src="js/player.js?v=20260530000000"></script>
-  <script src="js/daily.js?v=20260530000000"></script>
-  <script src="js/game.js?v=20260708050000"></script>
-  <script src="js/ui.js?v=20260708020000"></script>
-  <script src="js/app.js?v=20260708040000"></script>
+  <script src="js/daily.js?v=20260708110000"></script>
+  <script src="js/game.js?v=20260708130000"></script>
+  <script src="js/ui.js?v=20260708120000"></script>
+  <script src="js/app.js?v=20260708060000"></script>
 </body>
 </html>
