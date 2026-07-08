@@ -15,10 +15,8 @@ function aggregateRanking(items){
   const map={};
   items.forEach(i=>{
     const key=i.playerId||i.name;
-    if(!map[key]){ map[key]={ name:i.name, playerId:i.playerId||'', score:0, money:0, date:'' }; }
-    map[key].score += (i.score||0);
-    map[key].money += (i.money||0);
-    if(i.date && i.date > map[key].date) map[key].date = i.date;
+    const rs=calcRankScore(i);
+    if(!map[key]||rs>calcRankScore(map[key])){ map[key]={ name:i.name, playerId:i.playerId||'', score:i.score||0, money:i.money||0, date:i.date||'' }; }
   });
   return Object.values(map).sort((a,b)=>calcRankScore(b)-calcRankScore(a)).slice(0,5);
 }
