@@ -1,6 +1,6 @@
 // ===== 공통 UI =====
 
-const showToast=m=>{toast.textContent=m;toast.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>toast.classList.remove('show'),1600)};
+const showToast=m=>{toast.innerHTML=m.replace(/\n/g,'<br>');toast.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>toast.classList.remove('show'),1600)};
 const switchScreen=id=>{ $$('.screen').forEach(el=>{ el.classList.remove('active','fade-in-screen'); el.style.display='none'; }); const target=$(id); target.style.display=''; target.classList.add('active'); requestAnimationFrame(()=>target.classList.add('fade-in-screen')); if(id==='#introScreen'){ if(playerNameInput) playerNameInput.value=''; clearNameError(); } };
 
 const BAD_WORDS = ['씨발','씨팔','시발','시팔','ㅅㅂ','개새끼','개세끼','개쉐끼','병신','빙신','ㅂㅅ','지랄','지럴','창녀','창년','보지','자지','좆','졷','존나','졌나','ㅈㄴ','씹','씹새','새끼','세끼','쉐끼','쌍년','쌍놈','느개비','느그','미친놈','미친년','미친새끼','등신','돌아이','ㄷㅇ','걸레','갈보','육시랄','육시럴','뒤져','뒤져라','뒤지겠','꺼져','닥쳐','fuck','shit','bitch','asshole','bastard','dick','pussy','cunt','nigger','faggot'];
@@ -9,13 +9,13 @@ function showNameError(msg){ const el=$('#nameError'); if(!el) return; el.textCo
 function clearNameError(){ const el=$('#nameError'); if(el) el.style.display='none'; playerNameInput.style.borderColor=''; playerNameInput.style.boxShadow=''; }
 
 function validatePlayerName(name){
-  if(!name) return { ok:false, msg:'이름을 입력해주세요 🐷' };
+  if(!name) return { ok:false, msg:'꿀꿀~ 이름을 입력해주세요 🐷' };
   const lower = name.toLowerCase().replace(/\s/g,'');
-  for(const w of BAD_WORDS){ if(lower.includes(w)) return { ok:false, msg:'사용할 수 없는 단어가 포함되어 있어요 ⚠️' }; }
-  if(/[<>"'`;&|\\\/]/.test(name)) return { ok:false, msg:'사용할 수 없는 특수문자가 포함되어 있어요' };
+  for(const w of BAD_WORDS){ if(lower.includes(w)) return { ok:false, msg:'꿀꿀... 사용할 수 없는 단어가 포함되어 있어요 ⚠️' }; }
+  if(/[<>"'`;&|\\\/]/.test(name)) return { ok:false, msg:'꿀꿀... 사용할 수 없는 특수문자가 포함되어 있어요' };
   const len = [...name].length;
-  if(len < 3) return { ok:false, msg:'이름은 최소 3자 이상 입력해주세요 🐷' };
-  if(len > 12) return { ok:false, msg:'이름은 최대 12자까지 입력할 수 있어요 🐷' };
+  if(len < 3) return { ok:false, msg:'꿀꿀~ 이름은 최소 3자 이상 입력해주세요 🐷' };
+  if(len > 12) return { ok:false, msg:'꿀꿀~ 이름은 최대 12자까지 입력할 수 있어요 🐷' };
   return { ok:true };
 }
 
@@ -116,45 +116,45 @@ const COACH_DONE_KEY = 'ggul-coach-done';
 
 const _coachSteps = [
   {
-    targetId: null, // 첫 스텝은 대상 없이 전체 안내
-    title: '꿀꿀 저축챌린지에 오신걸 환영해요! 🐷',
-    desc: '게임 화면을 빠르게 안내해 드릴게요.\n(30초면 충분해요!)',
+    targetId: null,
+    title: '꿀꿀~ 저축챌린지에 오신걸 환영해요! 🐷',
+    desc: '게임 화면을 알려주겠다꿀! 🐷\n(5초면 충분해요!)',
   },
   {
     targetId: 'scoreBox',
     targetPad: 8,
     title: '📊 재무 점수 & 💰 오늘의 저축',
-    desc: '클릭·업그레이드·퀴즈 정답으로 재무 점수가 올라요.\n저축금액과 함께 랭킹 종합점수에 반영돼요.',
+    desc: '클릭·업그레이드·퀴즈 정답으로 재무 점수가 올라간다꿀! 🐷\n저축금액과 함께 랭킹 종합점수에 반영돼요.',
   },
   {
     targetId: 'earnBtn',
     targetPad: 8,
     title: '🐷 돼지저금통을 탭하세요!',
-    desc: '탭할 때마다 저축액이 늘어요.\n빠르게 연속으로 탭하면 콤보 배율(최대 ×3.5)이 올라 수익이 폭발해요 🔥',
+    desc: '탭할 때마다 저축액이 늘어난다꿀! 🐷\n빠르게 연속으로 탭하면 콤보 배율(최대 ×3.5)이 올라 수익이 폭발해요 🔥',
   },
   {
     targetId: 'clickLimitWrap',
     targetPad: 10,
     title: '🐾 클릭 현황',
-    desc: '하루 200번 클릭할 수 있어요.\n매일 자정에 초기화되니 매일 도전해요!',
+    desc: '하루 200번 클릭할 수 있다꿀! 🐷\n매일 자정에 초기화되니 매일 도전해봐요!',
   },
   {
     targetId: 'quickUpgradeList',
     targetPad: 10,
     title: '⚡ 빠른 업그레이드',
-    desc: '저축액으로 업그레이드를 구매하면 클릭 수익이 올라가요.\n각 항목은 최대 5회 구매 가능해요.',
+    desc: '저축액으로 업그레이드하면 클릭 수익이 올라간다꿀! 🐷\n각 항목은 최대 5회 구매 가능해요.',
   },
   {
     targetId: 'tipIconBtn',
     targetPad: 8,
     title: '💡 오늘의 금융 팁',
-    desc: '매일 새로운 금융 팁을 확인해요.\n읽기 완료하면 보너스 저축액도 받아요!',
+    desc: '매일 새로운 금융 팁을 알려준다꿀! 🐷\n읽기 완료하면 보너스 저축액도 받아요!',
   },
   {
     targetId: 'rankingBoardTitle',
     targetPad: 12,
     title: '🏆 실시간 랭킹',
-    desc: '오늘의 기록을 랭킹에 저장하고 다른 플레이어와 경쟁해요.\n재무점수가 높을수록 저축액이 더 크게 증폭돼요!',
+    desc: '기록을 랭킹에 저장하고 경쟁해본다꿀! 🐷\n재무점수가 높을수록 저축액이 더 크게 증폭돼요!',
   },
 ];
 

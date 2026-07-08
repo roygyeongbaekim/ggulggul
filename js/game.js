@@ -174,15 +174,15 @@ function buyUpgrade(index){
     if(win){
       state.clickIncome += item.value;
       changePiggyMood('happy');
-      showToast(`꿀꿀! 📈 대박났어요! 수익 +₩${item.value} (${item.bought}/${UPGRADE_MAX_COUNT}회)`);
+      showToast(`꿀꿀!\n📈 대박났어요! 수익 +₩${item.value} (${item.bought}/${UPGRADE_MAX_COUNT}회)`);
     } else {
       state.clickIncome = Math.max(10, state.clickIncome - item.value);
       changePiggyMood('sad');
-      showToast(`꿀꿀... 📉 손실났어요ㅠ 수익 -₩${item.value} (${item.bought}/${UPGRADE_MAX_COUNT}회)`);
+      showToast(`꿀꿀...\n📉 손실났어요ㅠ 수익 -₩${item.value} (${item.bought}/${UPGRADE_MAX_COUNT}회)`);
     }
   } else {
     state.clickIncome += item.value;
-    showToast(`꿀꿀~ ${item.name} 완료! 수익 +₩${item.value} 🐷`);
+    showToast(`꿀꿀~\n${item.name} 완료! 수익 +₩${item.value} 🐷`);
   }
   triggerCoinEjectAnimations(); updateUI(); triggerEventIfMet(); updateGoalProgress('upgrade',1); savePlayerState();
 }

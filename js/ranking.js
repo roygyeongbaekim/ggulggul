@@ -86,7 +86,7 @@ function renderRankList(container, list, showMeBadge, showDate){
     if(_rankingLoading){
       container.innerHTML = '<div class="ranking-loading"><div class="ranking-spinner"></div><div style="font-size:.82rem;color:var(--muted);font-weight:700">랭킹 불러오는 중...</div></div>';
     } else {
-      container.innerHTML = '<div class="rank-row"><div class="rank-badge medal-n">-</div><div><div class="rank-name">아직 기록이 없어요</div><div class="rank-meta">플레이 후 점수를 저장해보세요</div></div><div class="rank-score">-</div></div>';
+      container.innerHTML = '<div class="rank-row"><div class="rank-badge medal-n">🐷</div><div><div class="rank-name">꿀꿀~ 아직 기록이 없어요</div><div class="rank-meta">플레이 후 점수를 저장해봐요!</div></div><div class="rank-score">-</div></div>';
     }
     return;
   }

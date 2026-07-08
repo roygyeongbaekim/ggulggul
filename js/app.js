@@ -66,7 +66,7 @@ $('#startBtn').onclick = async () => {
       // Case 1 - 신규 uuid: 이름 중복 확인 후 등록
       const taken = await checkNameTaken(name, _pendingUuid);
       if(taken){
-        showNameError('이미 등록된 닉네임이에요. 다른 이름을 입력해주세요 🐷');
+        showNameError('꿀꿀~ 이미 등록된 닉네임이에요. 다른 이름을 입력해주세요 🐷');
         playerNameInput.focus();
         btn.disabled=false; btn.textContent='시작하기';
         return;
