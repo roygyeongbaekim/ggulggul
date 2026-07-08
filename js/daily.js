@@ -317,7 +317,10 @@ function showCheckinModal(data){
     calendarEl.appendChild(slot);
   }
 
-  modal.style.display = 'flex';
+  // 코치마크가 활성 중이면 숨김 상태로 대기, 코치마크 종료 시 자동 노출
+  const coachActive = document.getElementById('coachMark')?.style.display !== 'none';
+  modal.style.display = coachActive ? 'none' : 'flex';
+  if(coachActive) window._pendingCheckinModal = modal;
 
   document.getElementById('checkinCloseBtn').onclick = () => {
     modal.style.display = 'none';

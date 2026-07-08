@@ -111,6 +111,158 @@ function renderCheckinCalendar(){
   }
 }
 
+// ===== 코치마크 =====
+const COACH_DONE_KEY = 'ggul-coach-done';
+
+const _coachSteps = [
+  {
+    targetId: null, // 첫 스텝은 대상 없이 전체 안내
+    title: '꿀꿀 저축챌린지에 오신걸 환영해요! 🐷',
+    desc: '게임 화면을 빠르게 안내해 드릴게요.\n(30초면 충분해요!)',
+  },
+  {
+    targetId: 'scoreBox',
+    targetPad: 8,
+    title: '📊 재무 점수 & 💰 오늘의 저축',
+    desc: '클릭·업그레이드·퀴즈 정답으로 재무 점수가 올라요.\n저축금액과 함께 랭킹 종합점수에 반영돼요.',
+  },
+  {
+    targetId: 'earnBtn',
+    targetPad: 8,
+    title: '🐷 돼지저금통을 탭하세요!',
+    desc: '탭할 때마다 저축액이 늘어요.\n빠르게 연속으로 탭하면 콤보 배율(최대 ×3.5)이 올라 수익이 폭발해요 🔥',
+  },
+  {
+    targetId: 'clickLimitWrap',
+    targetPad: 10,
+    title: '🐾 클릭 현황',
+    desc: '하루 200번 클릭할 수 있어요.\n매일 자정에 초기화되니 매일 도전해요!',
+  },
+  {
+    targetId: 'quickUpgradeList',
+    targetPad: 10,
+    title: '⚡ 빠른 업그레이드',
+    desc: '저축액으로 업그레이드를 구매하면 클릭 수익이 올라가요.\n각 항목은 최대 5회 구매 가능해요.',
+  },
+  {
+    targetId: 'tipIconBtn',
+    targetPad: 8,
+    title: '💡 오늘의 금융 팁',
+    desc: '매일 새로운 금융 팁을 확인해요.\n읽기 완료하면 보너스 저축액도 받아요!',
+  },
+  {
+    targetId: 'rankingBoardTitle',
+    targetPad: 12,
+    title: '🏆 실시간 랭킹',
+    desc: '오늘의 기록을 랭킹에 저장하고 다른 플레이어와 경쟁해요.\n재무점수가 높을수록 저축액이 더 크게 증폭돼요!',
+  },
+];
+
+let _coachIdx = 0;
+
+function _coachPosition(targetId, pad){
+  const highlight = document.getElementById('coachHighlight');
+  const bubble    = document.getElementById('coachBubble');
+  const arrowEl   = document.getElementById('coachArrowEl');
+
+  if(!targetId){
+    // 첫 스텝: 타겟 없이 화면 중앙 팝업
+    highlight.style.display = 'none';
+    arrowEl.className = '';
+    arrowEl.style.cssText = 'display:none';
+    const bw = Math.min(300, window.innerWidth * 0.86);
+    bubble.style.cssText = `left:${(window.innerWidth - bw) / 2}px;top:${(window.innerHeight - 200) / 2}px;width:${bw}px`;
+    return;
+  }
+
+  const el = document.getElementById(targetId);
+  if(!el) return;
+
+  // 대상 영역 스크롤해서 보이게
+  el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+  // 약간 딜레이 후 위치 계산 (스크롤 완료 대기)
+  setTimeout(() => {
+    const r   = el.getBoundingClientRect();
+    const p   = pad || 8;
+    const ht  = r.top  - p;
+    const hl  = r.left - p;
+    const hw  = r.width  + p * 2;
+    const hh  = r.height + p * 2;
+
+    // 하이라이트 박스
+    highlight.style.cssText = `display:block;top:${ht}px;left:${hl}px;width:${hw}px;height:${hh}px`;
+
+    // 말풍선 가로 위치: 타겟 중앙 기준
+    const bw      = Math.min(300, window.innerWidth * 0.86);
+    const targetCx = hl + hw / 2;
+    const bx      = Math.max(12, Math.min(targetCx - bw / 2, window.innerWidth - bw - 12));
+
+    // 위/아래 공간 비교해서 말풍선 방향 결정
+    const BUBBLE_H  = 200;
+    const GAP       = 16;
+    const spaceDown = window.innerHeight - (ht + hh);
+    const spaceUp   = ht;
+    let by, arrowDir;
+
+    if(spaceDown >= BUBBLE_H + GAP || spaceDown >= spaceUp){
+      // 아래 배치: 화살표는 위쪽(↑) → 타겟을 가리킴
+      by       = ht + hh + GAP;
+      arrowDir = 'up';
+    } else {
+      // 위 배치: 화살표는 아래쪽(↓) → 타겟을 가리킴
+      by       = ht - BUBBLE_H - GAP;
+      arrowDir = 'down';
+    }
+    by = Math.max(8, Math.min(by, window.innerHeight - BUBBLE_H - 8));
+
+    bubble.style.cssText = `left:${bx}px;top:${by}px;width:${bw}px`;
+
+    // 화살표 삼각형: 타겟 중앙에 정렬
+    const arrowLeft = Math.max(16, Math.min(targetCx - bx - 12, bw - 40));
+    arrowEl.className = `arrow-${arrowDir}`;
+    arrowEl.style.cssText = `left:${arrowLeft}px`;
+  }, 60);
+}
+
+function _coachRender(){
+  const step = _coachSteps[_coachIdx];
+  document.getElementById('coachStepIndicator').textContent = `${_coachIdx + 1} / ${_coachSteps.length}`;
+  document.getElementById('coachTitle').textContent = step.title;
+  document.getElementById('coachDesc').textContent = step.desc;
+  document.getElementById('coachNextBtn').textContent = _coachIdx === _coachSteps.length - 1 ? '시작하기 🐷' : '다음 →';
+  _coachPosition(step.targetId, step.targetPad);
+}
+
+function startCoachMark(){
+  if(localStorage.getItem(COACH_DONE_KEY)) return;
+  _coachIdx = 0;
+  document.getElementById('coachMark').style.display = 'block';
+  _coachRender();
+}
+
+function _coachFinish(){
+  document.getElementById('coachMark').style.display = 'none';
+  localStorage.setItem(COACH_DONE_KEY, '1');
+  if(window._pendingCheckinModal){
+    const modal = window._pendingCheckinModal;
+    window._pendingCheckinModal = null;
+    setTimeout(() => { modal.style.display = 'flex'; }, 300);
+  }
+}
+
+document.getElementById('coachNextBtn').onclick = () => {
+  _coachIdx++;
+  if(_coachIdx >= _coachSteps.length){ _coachFinish(); return; }
+  _coachRender();
+};
+document.getElementById('coachSkipBtn').onclick = _coachFinish;
+document.getElementById('coachRestartBtn').onclick = () => {
+  _coachIdx = 0;
+  document.getElementById('coachMark').style.display = 'block';
+  _coachRender();
+};
+
 document.getElementById('checkinCalBtn').onclick = () => {
   const now = new Date();
   _calViewYear = now.getFullYear();

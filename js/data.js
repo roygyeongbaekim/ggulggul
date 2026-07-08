@@ -226,16 +226,16 @@
     ];
 
     const GOAL_POOL = [
-      { id:'tap30',    label:'저금통 30번 누르기',    type:'tap',         target:30,    reward:300,   icon:'👆' },
-      { id:'tap60',    label:'저금통 60번 누르기',    type:'tap',         target:60,    reward:600,   icon:'💪' },
-      { id:'tap100',   label:'저금통 100번 누르기',   type:'tap',         target:100,   reward:1000,  icon:'🏅' },
-      { id:'upg1',     label:'업그레이드 1회 구매',   type:'upgrade',     target:1,     reward:400,   icon:'⬆️' },
-      { id:'upg3',     label:'업그레이드 3회 구매',   type:'upgrade',     target:3,     reward:1200,  icon:'🚀' },
-      { id:'money5k',  label:'자산 ₩5,000 달성',     type:'money',       target:5000,  reward:500,   icon:'💰' },
-      { id:'money20k', label:'자산 ₩20,000 달성',    type:'money',       target:20000, reward:2000,  icon:'🏆' },
-      { id:'quiz1',    label:'금융 퀴즈 1개 정답',    type:'quizCorrect', target:1,     reward:600,   icon:'🎯' },
-      { id:'score50',  label:'재무 점수 50점 달성',   type:'score',       target:50,    reward:400,   icon:'📊' },
-      { id:'tap20',    label:'저금통 20번 누르기',    type:'tap',         target:20,    reward:180,   icon:'✨' },
-      { id:'upg2',     label:'업그레이드 2회 구매',   type:'upgrade',     target:2,     reward:700,   icon:'⚡' },
-      { id:'money10k', label:'자산 ₩10,000 달성',    type:'money',       target:10000, reward:1000,  icon:'💎' },
+      { id:'tap50',     label:'저금통 50번 누르기',      type:'tap',         target:50,     reward:500,   icon:'👆' },
+      { id:'tap100',    label:'저금통 100번 누르기',     type:'tap',         target:100,    reward:1000,  icon:'💪' },
+      { id:'tap150',    label:'저금통 150번 누르기',     type:'tap',         target:150,    reward:1800,  icon:'🏅' },
+      { id:'upg2',      label:'업그레이드 2회 구매',     type:'upgrade',     target:2,      reward:800,   icon:'⬆️' },
+      { id:'upg5',      label:'업그레이드 5회 구매',     type:'upgrade',     target:5,      reward:2000,  icon:'🚀' },
+      { id:'money30k',  label:'자산 ₩30,000 달성',      type:'money',       target:30000,  reward:1500,  icon:'💰' },
+      { id:'money80k',  label:'자산 ₩80,000 달성',      type:'money',       target:80000,  reward:4000,  icon:'🏆' },
+      { id:'money150k', label:'자산 ₩150,000 달성',     type:'money',       target:150000, reward:8000,  icon:'💎' },
+      { id:'quiz2',     label:'금융 퀴즈 2개 정답',      type:'quizCorrect', target:2,      reward:1500,  icon:'🎯' },
+      { id:'score100',  label:'재무 점수 100점 달성',    type:'score',       target:100,    reward:1000,  icon:'📊' },
+      { id:'score200',  label:'재무 점수 200점 달성',    type:'score',       target:200,    reward:2500,  icon:'📈' },
+      { id:'upg3',      label:'업그레이드 3회 구매',     type:'upgrade',     target:3,      reward:1200,  icon:'⚡' },
     ];

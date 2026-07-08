@@ -131,7 +131,7 @@ function showMoneyFloat(amount, positive=true){
   setTimeout(()=>el.remove(),1000);
 }
 
-function triggerCoinAnimations(){ coinPop.classList.remove('drop'); void coinPop.offsetWidth; coinPop.classList.add('drop'); const coin=document.createElement('span'); coin.className='coin-entry'; piggyMouth.appendChild(coin); void coin.offsetWidth; coin.classList.add('fly'); pigTail.classList.remove('wiggle'); void pigTail.offsetWidth; pigTail.classList.add('wiggle'); setTimeout(()=>coin.remove(),700); }
+function triggerCoinAnimations(){ coinPop.classList.remove('drop'); void coinPop.offsetWidth; coinPop.classList.add('drop'); pigTail.classList.remove('wiggle'); void pigTail.offsetWidth; pigTail.classList.add('wiggle'); }
 
 function triggerCoinEjectAnimations(){
   const count = 3;

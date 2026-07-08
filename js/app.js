@@ -18,6 +18,8 @@ async function doLogin(playerId, playerName, prevLogin=null){
   renderRanking();
   initDailySystem();
   updateUI();
+  // 첫 접속 플레이어에게 코치마크 표시
+  requestAnimationFrame(() => requestAnimationFrame(() => startCoachMark()));
 }
 
 // ===== Case 1: ?uuid= 파라미터가 있을 때 =====
