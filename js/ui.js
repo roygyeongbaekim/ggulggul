@@ -1,7 +1,7 @@
 // ===== 공통 UI =====
 
 const showToast=m=>{toast.innerHTML=m.replace(/\n/g,'<br>');toast.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>toast.classList.remove('show'),1600)};
-const switchScreen=id=>{ $$('.screen').forEach(el=>{ el.classList.remove('active','fade-in-screen'); el.style.display='none'; }); const target=$(id); target.style.display=''; target.classList.add('active'); requestAnimationFrame(()=>target.classList.add('fade-in-screen')); if(id==='#introScreen'){ if(playerNameInput) playerNameInput.value=''; clearNameError(); } };
+const switchScreen=id=>{ $$('.screen').forEach(el=>{ el.classList.remove('active','fade-in-screen'); el.style.display='none'; }); const target=$(id); target.style.display=''; target.classList.add('active'); requestAnimationFrame(()=>target.classList.add('fade-in-screen')); window.scrollTo(0,0); if(id==='#introScreen'){ if(playerNameInput) playerNameInput.value=''; clearNameError(); } };
 
 const BAD_WORDS = ['씨발','씨팔','시발','시팔','ㅅㅂ','개새끼','개세끼','개쉐끼','병신','빙신','ㅂㅅ','지랄','지럴','창녀','창년','보지','자지','좆','졷','존나','졌나','ㅈㄴ','씹','씹새','새끼','세끼','쉐끼','쌍년','쌍놈','느개비','느그','미친놈','미친년','미친새끼','등신','돌아이','ㄷㅇ','걸레','갈보','육시랄','육시럴','뒤져','뒤져라','뒤지겠','꺼져','닥쳐','fuck','shit','bitch','asshole','bastard','dick','pussy','cunt','nigger','faggot'];
 
