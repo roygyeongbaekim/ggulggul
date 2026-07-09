@@ -56,7 +56,7 @@ let _pendingUuid = null;
 $('#startBtn').onclick = async () => {
   const name = (playerNameInput?.value||'').trim();
   const result = validatePlayerName(name);
-  if(!result.ok){ showNameError(result.msg); playerNameInput.focus(); return; }
+  if(!result.ok){ showNameError(result.msg); playerNameInput.blur(); return; }
   clearNameError();
 
   const btn = $('#startBtn'); btn.disabled=true; btn.textContent='꿀꿀~ 불러오는 중...';
@@ -67,7 +67,7 @@ $('#startBtn').onclick = async () => {
       const taken = await checkNameTaken(name, _pendingUuid);
       if(taken){
         showNameError('꿀꿀~ 이미 등록된 닉네임이에요. 다른 이름을 입력해주세요 🐷');
-        playerNameInput.focus();
+        playerNameInput.blur();
         btn.disabled=false; btn.textContent='시작하기';
         return;
       }
