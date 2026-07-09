@@ -53,7 +53,7 @@ let _pendingUuid = null;
 })();
 
 // ===== 시작하기 버튼 =====
-$('#startBtn').addEventListener('touchend', e => { e.preventDefault(); $('#startBtn').click(); });
+$('#startBtn').addEventListener('touchstart', () => { if(playerNameInput) playerNameInput.blur(); }, { passive: true });
 $('#startBtn').onclick = async () => {
   const name = (playerNameInput?.value||'').trim();
   const result = validatePlayerName(name);
