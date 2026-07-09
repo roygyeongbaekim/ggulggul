@@ -21,8 +21,8 @@ function validatePlayerName(name){
 
 playerNameInput.oninput = () => clearNameError();
 
-$('#introScreen').addEventListener('touchstart', e => { if(e.target !== playerNameInput) playerNameInput.blur(); }, { passive: true });
-$('#introScreen').addEventListener('mousedown', e => { if(e.target !== playerNameInput) playerNameInput.blur(); });
+$('#introScreen').addEventListener('touchstart', e => { if(e.target !== playerNameInput){ playerNameInput.blur(); clearNameError(); } }, { passive: true });
+$('#introScreen').addEventListener('mousedown', e => { if(e.target !== playerNameInput){ playerNameInput.blur(); clearNameError(); } });
 
 function fmtDatetime(ts){
   if(!ts) return '';
