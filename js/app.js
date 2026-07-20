@@ -1,6 +1,6 @@
 // ===== 앱 진입점 / 로그인 / 초기화 =====
 
-async function doLogin(playerId, playerName, prevLogin=null){
+async function doLogin(playerId, playerName, prevLogin=null, isNewPlayer=false){
   state.playerName = playerName;
   const [fsState, fsDailyData] = await Promise.all([loadPlayerStateFromFs(playerId), loadDailyDataFromFs(playerId)]);
   if(fsState) localStorage.setItem(getPlayerStateKey(), JSON.stringify({...fsState, playerId}));
@@ -18,8 +18,8 @@ async function doLogin(playerId, playerName, prevLogin=null){
   renderRanking();
   initDailySystem();
   updateUI();
-  // 첫 접속 플레이어에게 코치마크 표시
-  requestAnimationFrame(() => requestAnimationFrame(() => startCoachMark()));
+  // DB 기준 첫 접속 플레이어에게만 코치마크 표시
+  if(isNewPlayer) requestAnimationFrame(() => requestAnimationFrame(() => startCoachMark()));
 }
 
 // ===== Case 1: ?uuid= 파라미터가 있을 때 =====
@@ -41,9 +41,9 @@ let _pendingUuid = null;
 
     const snap = await db.ref('players/'+safeKey(uuid)).get();
     if(snap.exists() && snap.val().name){
-      // DB에 등록된 uuid → 바로 게임 진입
+      // DB에 등록된 uuid → 바로 게임 진입 (기존 플레이어)
       const playerData = snap.val();
-      await doLogin(uuid, playerData.name, playerData.lastLoginAt||null);
+      await doLogin(uuid, playerData.name, playerData.lastLoginAt||null, false);
       return;
     }
     // DB에 없는 uuid → 인트로 화면에서 이름 입력 대기
@@ -73,7 +73,7 @@ $('#startBtn').onclick = async () => {
         return;
       }
       await db.ref('players/'+safeKey(_pendingUuid)).set({ name, playerId:_pendingUuid, createdAt:TS() });
-      await doLogin(_pendingUuid, name, null);
+      await doLogin(_pendingUuid, name, null, true); // 신규 uuid 등록 → 첫 접속
     } else {
       // Case 2 - uuid 없음: 이름으로 기존 플레이어 조회 → 있으면 해당 정보로 진입, 없으면 신규 등록
       const existingId = await findOrCreatePlayer(name);
@@ -81,7 +81,8 @@ $('#startBtn').onclick = async () => {
       if(db && existingId){
         try { const ps = await db.ref('players/'+safeKey(existingId)).get(); if(ps.exists()) prevLogin = ps.val().lastLoginAt||null; } catch(e){}
       }
-      await doLogin(existingId || generatePlayerId(), name, prevLogin);
+      const isNew = !prevLogin; // lastLoginAt 없음 = DB 기준 첫 접속
+      await doLogin(existingId || generatePlayerId(), name, prevLogin, isNew);
     }
   } catch(e){
     console.warn('[FS] 로그인 처리 실패, localStorage 폴백:', e);

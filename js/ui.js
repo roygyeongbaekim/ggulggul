@@ -112,8 +112,6 @@ function renderCheckinCalendar(){
 }
 
 // ===== 코치마크 =====
-const COACH_DONE_KEY = 'ggul-coach-done';
-
 const _coachSteps = [
   {
     targetId: null,
@@ -235,7 +233,6 @@ function _coachRender(){
 }
 
 function startCoachMark(){
-  if(localStorage.getItem(COACH_DONE_KEY)) return;
   _coachIdx = 0;
   document.getElementById('coachMark').style.display = 'block';
   _coachRender();
@@ -243,7 +240,6 @@ function startCoachMark(){
 
 function _coachFinish(){
   document.getElementById('coachMark').style.display = 'none';
-  localStorage.setItem(COACH_DONE_KEY, '1');
   if(window._pendingCheckinModal){
     const modal = window._pendingCheckinModal;
     window._pendingCheckinModal = null;
