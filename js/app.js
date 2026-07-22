@@ -16,6 +16,7 @@ async function doLogin(playerId, playerName, prevLogin=null, isNewPlayer=false){
   if(logo) logo.textContent = state.playerName + '의 저축';
   updateLastLoginDisplay(prevLogin);
   renderRanking();
+  if(isNewPlayer) window._coachWillStart = true; // showCheckinModal이 코치마크 종료 후 표시하도록 예약
   initDailySystem();
   updateUI();
   // DB 기준 첫 접속 플레이어에게만 코치마크 표시

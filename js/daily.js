@@ -330,8 +330,9 @@ function showCheckinModal(data){
     calendarEl.appendChild(slot);
   }
 
-  // 코치마크가 활성 중이면 숨김 상태로 대기, 코치마크 종료 시 자동 노출
-  const coachActive = document.getElementById('coachMark')?.style.display !== 'none';
+  // 코치마크가 활성 중이거나 곧 시작될 예정이면 숨김 상태로 대기, 코치마크 종료 시 자동 노출
+  const coachActive = document.getElementById('coachMark')?.style.display !== 'none' || !!window._coachWillStart;
+  window._coachWillStart = false;
   modal.style.display = coachActive ? 'none' : 'flex';
   if(coachActive) window._pendingCheckinModal = modal;
 
