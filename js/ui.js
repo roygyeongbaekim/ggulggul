@@ -140,7 +140,7 @@ const _coachSteps = [
     targetId: 'quickUpgradeList',
     targetPad: 10,
     title: '⚡ 빠른 업그레이드',
-    desc: '저축액으로 업그레이드하면 클릭 수익이 올라간다꿀! 🐷\n각 항목은 최대 5회 구매 가능해요.',
+    desc: '저축액으로 업그레이드하면 클릭 수익이 올라간다꿀! 🐷\n각 항목은 최대 5회 구매 가능해요.\n📈 인덱스 투자는 50% 확률로 수익이 오르거나 내려가는 고위험 항목이에요!',
   },
   {
     targetId: 'tipIconBtn',
