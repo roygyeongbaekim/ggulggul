@@ -3,7 +3,7 @@
   --primary:#eb789b; --primary-dark:#d95d85; --accent:#ffd76b; --success:#4c8f5a; --border:rgba(78,55,60,.12);
   --shadow:0 16px 34px rgba(195,109,137,.18); --radius:22px; --radius-sm:14px; --radius-full:9999px;
 }
-*{box-sizing:border-box} html{-webkit-text-size-adjust:100%;text-size-adjust:100%} html,body{margin:0;padding:0}
+*{box-sizing:border-box} html{-webkit-text-size-adjust:100%;text-size-adjust:100%;font-size:17px} html,body{margin:0;padding:0}
 body{font-family:Arial,'Noto Sans KR',sans-serif;background:radial-gradient(circle at top left, rgba(255,215,107,.24), transparent 28%),radial-gradient(circle at 85% 10%, rgba(235,120,155,.18), transparent 24%),var(--bg);color:var(--text);touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;overflow-x:hidden}
 button{font:inherit;border:0;background:none;color:inherit;cursor:pointer}
 .app{width:min(1100px,calc(100% - 20px));margin:0 auto;padding:18px 0 40px}
