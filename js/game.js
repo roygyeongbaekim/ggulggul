@@ -203,9 +203,7 @@ function renderQuickUpgrades(){
         <div class="up-icon">${item.icon}${isRisky ? '<span class="risk-dot"></span>' : ''}</div>
         <div class="up-count-badge">${maxed ? '✓' : `${item.bought}/${UPGRADE_MAX_COUNT}`}</div>
       </div>
-      ${isRisky ? '<span class="risk-tag">⚠️ RISK</span>' : ''}
-      <div class="up-cost">${maxed ? '완료' : formatMoney(item.cost)}</div>
-      ${isRisky && !maxed ? `<div class="up-risk-preview">📈 +₩${item.value.toLocaleString('ko-KR')} / 📉 -₩${item.value.toLocaleString('ko-KR')}</div>` : ''}`;
+      <div class="up-cost">${maxed ? '완료' : formatMoney(item.cost)}</div>`;
     btn.onclick = () => buyUpgrade(index);
     quickUpgradeList.appendChild(btn);
   });
