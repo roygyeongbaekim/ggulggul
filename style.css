@@ -183,6 +183,8 @@ button{font:inherit;border:0;background:none;color:inherit;cursor:pointer}
 #coachOverlay{position:fixed;inset:0;background:rgba(0,0,0,.65);pointer-events:all}
 #coachHighlight{position:fixed;z-index:2810;border-radius:14px;outline:3px solid rgba(255,255,255,.8);outline-offset:2px;pointer-events:none;transition:top .32s ease,left .32s ease,width .32s ease,height .32s ease;box-shadow:0 0 0 9999px transparent}
 @keyframes coachPulse{0%,100%{outline-color:rgba(255,255,255,.8)}50%{outline-color:rgba(235,120,155,.9)}}
+@keyframes pigBounce{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-16px) rotate(4deg)}}
+@keyframes dotPulse{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
 #coachHighlight{animation:coachPulse 1.8s ease-in-out infinite}
 #coachBubble{position:fixed;z-index:2820;background:#fff;border-radius:20px;padding:18px 20px 16px;width:min(300px,86vw);max-height:calc(100vh - 48px);overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.28);pointer-events:all;transition:top .32s ease,left .32s ease}
 #coachArrowEl{position:absolute;width:0;height:0;pointer-events:none}

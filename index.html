@@ -14,6 +14,17 @@
 <body>
   <div class="app">
     <section class="screen intro active" id="introScreen">
+      <!-- UUID 자동 로그인 로딩 오버레이 -->
+      <div id="uuidLoading" style="display:none;position:fixed;inset:0;z-index:500;background:linear-gradient(160deg,#fff5f8,#fff0e8);display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:32px">
+        <div style="font-size:5rem;animation:pigBounce 1s ease-in-out infinite">🐷</div>
+        <div style="font-size:1.15rem;font-weight:900;color:#7b2845;text-align:center;line-height:1.6" id="uuidLoadingMsg">꿀꿀~ 저축챌린지 접속 중이에요!</div>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:4px">
+          <span style="width:8px;height:8px;border-radius:50%;background:#f9a8c9;animation:dotPulse 1.2s ease-in-out infinite;animation-delay:0s"></span>
+          <span style="width:8px;height:8px;border-radius:50%;background:#f9a8c9;animation:dotPulse 1.2s ease-in-out infinite;animation-delay:.2s"></span>
+          <span style="width:8px;height:8px;border-radius:50%;background:#f9a8c9;animation:dotPulse 1.2s ease-in-out infinite;animation-delay:.4s"></span>
+        </div>
+        <p style="font-size:.82rem;color:var(--muted);font-weight:600;text-align:center;margin-top:8px">돼지저금통이 열심히 준비 중이에요 🐽</p>
+      </div>
       <div class="panel intro-card">
         <div class="intro-bg-coins"><span class="bg-coin" style="left:6%; bottom:-24px; animation-delay:0s; animation-duration:7.2s"></span><span class="bg-coin" style="left:21%; bottom:-42px; animation-delay:1.2s; animation-duration:6.3s"></span><span class="bg-coin" style="left:39%; bottom:-30px; animation-delay:.6s; animation-duration:8.2s"></span><span class="bg-coin" style="left:63%; bottom:-38px; animation-delay:2s; animation-duration:7.6s"></span><span class="bg-coin" style="left:79%; bottom:-26px; animation-delay:1.5s; animation-duration:6.9s"></span><span class="bg-coin" style="left:90%; bottom:-34px; animation-delay:2.5s; animation-duration:8.4s"></span></div>
         <img src="pigbank.jpg" alt="꿀꿀 저축챌린지 돼지저금통" class="intro-pigbank-img">
