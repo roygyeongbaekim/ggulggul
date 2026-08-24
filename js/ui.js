@@ -128,7 +128,7 @@ const _coachSteps = [
     targetId: 'earnBtn',
     targetPad: 8,
     title: '🐷 돼지저금통을 탭하세요!',
-    desc: '탭할 때마다 저축액이 늘어난다꿀! 🐷\n빠르게 연속으로 탭하면 콤보 배율(최대 ×3.5)이 올라 수익이 폭발해요 🔥',
+    desc: '탭할 때마다 저축액이 늘어난다꿀! 🐷\n빠르게 연속으로 탭하면 콤보 배율(최대 ×3.3)이 올라 수익이 폭발해요 🔥',
   },
   {
     targetId: 'clickLimitWrap',

@@ -30,10 +30,12 @@ let _pendingUuid = null;
 
 (async()=>{
   const params = new URLSearchParams(location.search);
-  const uuid = params.get('uuid');
-  if(!uuid || uuid.length < 32) return; // Case 2: uuid 없으면 인트로 화면 그대로
+  const uuid = params.get('uuid'); // null: 파라미터 없음, '': 빈값, 'xxx': 값 있음
 
-  // 로딩 화면 표시
+  // uuid 파라미터 자체가 없으면 → 로딩 없이 인트로 화면 그대로
+  if(uuid === null) return;
+
+  // uuid 파라미터가 있으면 무조건 로딩 화면 표시
   const loadingEl = document.getElementById('uuidLoading');
   const loadingMsgEl = document.getElementById('uuidLoadingMsg');
   const _msgs = [
@@ -44,34 +46,37 @@ let _pendingUuid = null;
     '오늘도 저축 도전이다꿀! 🐷🪙',
   ];
   let _msgIdx = 0;
-  if(loadingEl){ loadingEl.style.display = 'flex'; }
+  if(loadingEl) loadingEl.style.display = 'flex';
   const _msgTimer = setInterval(() => {
     _msgIdx = (_msgIdx + 1) % _msgs.length;
     if(loadingMsgEl) loadingMsgEl.textContent = _msgs[_msgIdx];
   }, 1800);
 
   const _hideLoading = () => { clearInterval(_msgTimer); if(loadingEl) loadingEl.style.display = 'none'; };
+  const _showIntro = () => { _hideLoading(); if(playerNameInput) playerNameInput.focus(); };
+
+  // Case 1: uuid가 빈값이면 → 인트로 화면
+  if(!uuid) { _showIntro(); return; }
 
   try {
     if(!db){
       let waited=0;
       await new Promise(res=>{ const t=setInterval(()=>{ waited+=200; if(db||waited>=5000){ clearInterval(t); res(); } },200); });
     }
-    if(!db){ _hideLoading(); return; }
+    if(!db){ _showIntro(); return; }
 
     const snap = await db.ref('players/'+safeKey(uuid)).get();
     if(snap.exists() && snap.val().name){
-      // DB에 등록된 uuid → 바로 게임 진입 (기존 플레이어)
+      // 기존 플레이어 → 게임 화면으로 이동
       const playerData = snap.val();
       await doLogin(uuid, playerData.name, playerData.lastLoginAt||null, false);
       _hideLoading();
       return;
     }
-    // DB에 없는 uuid → 인트로 화면에서 이름 입력 대기
-    _hideLoading();
+    // Case 2: uuid가 처음 들어오는 값 → 인트로 화면에서 이름 입력
     _pendingUuid = uuid;
-    if(playerNameInput) playerNameInput.focus();
-  } catch(e){ console.warn('[UUID Login] 실패:', e); _hideLoading(); }
+    _showIntro();
+  } catch(e){ console.warn('[UUID Login] 실패:', e); _showIntro(); }
 })();
 
 // ===== 시작하기 버튼 =====
