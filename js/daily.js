@@ -6,7 +6,7 @@ function getSecondsUntilMidnight(){ const now=new Date(),m=new Date(now); m.setH
 function formatCountdown(s){ return String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor((s%3600)/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
 
 function renderClickLimit(){
-  const barEl=document.getElementById('clickLimitBar'), textEl=document.getElementById('clickLimitText'), cdEl=document.getElementById('clickCountdown');
+  const barEl=document.getElementById('clickLimitBar'), textEl=document.getElementById('clickLimitText');
   if(!barEl||!textEl) return;
   const used=state.dailyData?.dailyClicks||0;
   const pct=Math.min(100,Math.round((used/DAILY_CLICK_LIMIT)*100));
@@ -16,18 +16,16 @@ function renderClickLimit(){
   textEl.style.color=pct>=100?'#e53e3e':pct>=70?'#ff6b1a':'#7b2845';
   const over=used>=DAILY_CLICK_LIMIT;
   earnBtn.style.opacity=over?'0.45':''; earnBtn.style.filter=over?'grayscale(55%)':''; earnBtn.style.cursor=over?'not-allowed':'';
-  if(cdEl) cdEl.style.display='none';
   const overlay=document.getElementById('tapDoneOverlay');
-  const cdDone=document.getElementById('tapDoneCountdown');
   if(overlay){ overlay.style.display=over?'block':'none'; }
-  if(cdDone&&over){ cdDone.textContent='⏰ '+formatCountdown(getSecondsUntilMidnight())+' 후 초기화'; }
+  // 카운트다운은 전용 인터벌(_countdownTimer)에서 처리
   const completeCard=document.getElementById('dailyCompleteCard');
   if(completeCard){
     if(over){
       completeCard.style.display='block';
       const rm=document.getElementById('resultMoney'); if(rm) rm.textContent=formatMoney(state.money);
-      const rc=document.getElementById('resultCombo'); if(rc){ const bm=parseFloat((1+((state.bestCombo||1)-1)*0.25).toFixed(2)); rc.textContent='×'+bm.toFixed(1); }
-      const rs=document.getElementById('resultScore'); if(rs) rs.textContent=state.score.toLocaleString('ko-KR');
+const rs=document.getElementById('resultScore'); if(rs) rs.textContent=state.score.toLocaleString('ko-KR');
+      if(!isRankingSavedToday()) doSaveRanking();
       applyRankingSavedState();
     } else {
       completeCard.style.display='none';
@@ -37,10 +35,8 @@ function renderClickLimit(){
 
 function applyRankingSavedState(){
   const saved = isRankingSavedToday();
-  const btn = document.getElementById('resultSaveBtn');
-  const msg = document.getElementById('resultSavedMsg');
-  if(btn){ btn.disabled = saved; btn.style.opacity = saved ? '0.5' : ''; }
-  if(msg) msg.style.display = saved ? 'block' : 'none';
+  const banner = document.getElementById('rankAutoSavedBanner');
+  if(banner) banner.style.display = saved ? 'block' : 'none';
 }
 
 function doSaveRanking(){
@@ -54,7 +50,6 @@ function doSaveRanking(){
   applyRankingSavedState();
 }
 
-document.getElementById('resultSaveBtn').onclick = doSaveRanking;
 
 function loadDailyData(){ try{ return JSON.parse(localStorage.getItem(getDailyKey())||'null'); }catch(e){ return null; } }
 function saveDailyData(d){ localStorage.setItem(getDailyKey(), JSON.stringify(d)); savePlayerState(); flushDailyDataToFs(); }
@@ -345,6 +340,14 @@ function showCheckinModal(data){
     showToast('꿀꿀~ 출석 보너스 +' + formatMoney(bonus) + ' 받았어요! 🐷🎉');
   };
 }
+
+// 카운트다운 전용 인터벌 (1초마다 남은 시간 갱신)
+setInterval(()=>{
+  const cdDone = document.getElementById('tapDoneCountdown');
+  if(cdDone && (state.dailyData?.dailyClicks||0) >= DAILY_CLICK_LIMIT){
+    cdDone.textContent = '⏰ ' + formatCountdown(getSecondsUntilMidnight());
+  }
+}, 1000);
 
 setInterval(()=>{
   if(state.dailyData && state.dailyData.lastDate && state.dailyData.lastDate !== getTodayStr()){
