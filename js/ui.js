@@ -140,7 +140,13 @@ const _coachSteps = [
     targetId: 'quickUpgradeList',
     targetPad: 10,
     title: '⚡ 빠른 업그레이드',
-    desc: '저축액으로 업그레이드하면 클릭 수익이 올라간다꿀! 🐷\n각 항목은 최대 5회 구매 가능해요.\n📈 인덱스 투자는 50% 확률로 수익이 오르거나 내려가는 고위험 항목이에요!',
+    desc: '저축액으로 업그레이드하면 클릭 수익이 올라간다꿀! 🐷\n각 항목은 최대 5회 구매 가능해요.',
+  },
+  {
+    targetId: 'upgrade-fund',
+    targetPad: 10,
+    title: '⚠️ 고위험 항목: 인덱스 투자',
+    desc: '<span style="color:#e04000;font-weight:900">⚠️ 50% 확률로 수익이 오르거나 내려갈 수 있어요!</span>\n결과가 불확실한 고위험 항목이다꿀~ 🐷\n여유 저축이 충분할 때만 도전해봐요!',
   },
   {
     targetId: 'tipIconBtn',
@@ -196,8 +202,8 @@ function _coachPosition(targetId, pad){
     const targetCx = hl + hw / 2;
     const bx      = Math.max(12, Math.min(targetCx - bw / 2, window.innerWidth - bw - 12));
 
-    // 위/아래 공간 비교해서 말풍선 방향 결정
-    const BUBBLE_H  = 200;
+    // 위/아래 공간 비교해서 말풍선 방향 결정 (실제 렌더된 높이 측정)
+    const BUBBLE_H  = bubble.getBoundingClientRect().height || 200;
     const GAP       = 16;
     const spaceDown = window.innerHeight - (ht + hh);
     const spaceUp   = ht;
