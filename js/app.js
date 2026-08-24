@@ -33,24 +33,45 @@ let _pendingUuid = null;
   const uuid = params.get('uuid');
   if(!uuid || uuid.length < 32) return; // Case 2: uuid 없으면 인트로 화면 그대로
 
+  // 로딩 화면 표시
+  const loadingEl = document.getElementById('uuidLoading');
+  const loadingMsgEl = document.getElementById('uuidLoadingMsg');
+  const _msgs = [
+    '꿀꿀~ 저축챌린지 접속 중이에요! 🐷',
+    '돼지저금통이 열심히 준비 중이에요 🐽',
+    '꿀꿀꿀~ 저축 기록을 불러오는 중!',
+    '잠깐만요! 돼지가 달려가고 있어요 🐷💨',
+    '오늘도 저축 도전이다꿀! 🐷🪙',
+  ];
+  let _msgIdx = 0;
+  if(loadingEl){ loadingEl.style.display = 'flex'; }
+  const _msgTimer = setInterval(() => {
+    _msgIdx = (_msgIdx + 1) % _msgs.length;
+    if(loadingMsgEl) loadingMsgEl.textContent = _msgs[_msgIdx];
+  }, 1800);
+
+  const _hideLoading = () => { clearInterval(_msgTimer); if(loadingEl) loadingEl.style.display = 'none'; };
+
   try {
     if(!db){
       let waited=0;
       await new Promise(res=>{ const t=setInterval(()=>{ waited+=200; if(db||waited>=5000){ clearInterval(t); res(); } },200); });
     }
-    if(!db) return;
+    if(!db){ _hideLoading(); return; }
 
     const snap = await db.ref('players/'+safeKey(uuid)).get();
     if(snap.exists() && snap.val().name){
       // DB에 등록된 uuid → 바로 게임 진입 (기존 플레이어)
       const playerData = snap.val();
       await doLogin(uuid, playerData.name, playerData.lastLoginAt||null, false);
+      _hideLoading();
       return;
     }
     // DB에 없는 uuid → 인트로 화면에서 이름 입력 대기
+    _hideLoading();
     _pendingUuid = uuid;
     if(playerNameInput) playerNameInput.focus();
-  } catch(e){ console.warn('[UUID Login] 실패:', e); }
+  } catch(e){ console.warn('[UUID Login] 실패:', e); _hideLoading(); }
 })();
 
 // ===== 시작하기 버튼 =====
