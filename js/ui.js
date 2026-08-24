@@ -182,10 +182,10 @@ function _coachPosition(targetId, pad){
   const el = document.getElementById(targetId);
   if(!el) return;
 
-  // 대상 영역 스크롤해서 보이게
-  el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  // 대상 영역 스크롤해서 보이게 (instant: 스크롤 완료 후 즉시 측정 가능)
+  el.scrollIntoView({ block: 'nearest', behavior: 'instant' });
 
-  // 약간 딜레이 후 위치 계산 (스크롤 완료 대기)
+  // 약간 딜레이 후 위치 계산 (레이아웃 안정화 대기)
   setTimeout(() => {
     const r   = el.getBoundingClientRect();
     const p   = pad || 8;
@@ -233,7 +233,7 @@ function _coachRender(){
   const step = _coachSteps[_coachIdx];
   document.getElementById('coachStepIndicator').textContent = `${_coachIdx + 1} / ${_coachSteps.length}`;
   document.getElementById('coachTitle').textContent = step.title;
-  document.getElementById('coachDesc').textContent = step.desc;
+  document.getElementById('coachDesc').innerHTML = step.desc.replace(/\n/g, '<br>');
   document.getElementById('coachNextBtn').textContent = _coachIdx === _coachSteps.length - 1 ? '시작하기 🐷' : '다음 →';
   _coachPosition(step.targetId, step.targetPad);
 }
