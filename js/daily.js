@@ -1,6 +1,6 @@
 // ===== 데일리 시스템 =====
 
-function getDailyKey(){ return 'ggul-daily-v2-' + state.playerName; }
+function getDailyKey(){ return 'ggul-daily-v2-' + (state.playerId || state.playerName); }
 
 function getSecondsUntilMidnight(){ const now=new Date(),m=new Date(now); m.setHours(24,0,0,0); return Math.floor((m-now)/1000); }
 function formatCountdown(s){ return String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor((s%3600)/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
@@ -52,7 +52,7 @@ function doSaveRanking(){
 
 
 function loadDailyData(){ try{ return JSON.parse(localStorage.getItem(getDailyKey())||'null'); }catch(e){ return null; } }
-function saveDailyData(d){ localStorage.setItem(getDailyKey(), JSON.stringify(d)); savePlayerState(); flushDailyDataToFs(); }
+function saveDailyData(d){ localStorage.setItem(getDailyKey(), JSON.stringify(d)); savePlayerState(); flushDailyDataToFs(); flushCheckinDatesToFs(d.checkinDates||[]); }
 
 function generateDailyGoals(dayIndex){
   const n = GOAL_POOL.length;
@@ -74,6 +74,12 @@ function initDailySystem(){
     data = { streak:0, lastDate:null, goals:[], goalDate:null, tipClaimed:false, dailyClicks:0, goalsCelebrated:false, rankingSaved:false, checkinDates:[] };
   }
   if(!data.checkinDates) data.checkinDates = [];
+  // Firebase에서 불러온 출석 날짜와 로컬 데이터 병합 (기기간 출석 이력 동기화)
+  if(state._fsCheckinDates && state._fsCheckinDates.length){
+    const merged = new Set([...data.checkinDates, ...state._fsCheckinDates]);
+    data.checkinDates = [...merged].sort();
+    state._fsCheckinDates = null;
+  }
   // 기존 streak 데이터로 checkinDates 백필 (처음 도입 시 과거 날짜 복원)
   if(data.checkinDates.length === 0 && data.streak > 0 && data.lastDate){
     for(let i = 0; i < data.streak; i++){
@@ -165,13 +171,18 @@ function renderDailyTip(){
 
 document.getElementById('tipClaimBtn').onclick = () => {
   if(!state.dailyData || state.dailyData.tipClaimed) return;
+  const clicksDone = (state.dailyData.dailyClicks||0) >= DAILY_CLICK_LIMIT;
   state.dailyData.tipClaimed = true;
-  state.money += 300;
-  state.score += 3;
+  if(!clicksDone){
+    state.money += 300;
+    state.score += 3;
+    showToast('꿀꿀~ 금융 팁 읽기 완료! +₩300 🐷💡');
+  } else {
+    showToast('꿀꿀~ 금융 팁 읽기 완료! 🐷💡\n(200번 완료 후에는 저축 보너스가 없어요)');
+  }
   saveDailyData(state.dailyData);
   renderDailyTip();
   updateUI();
-  showToast('꿀꿀~ 금융 팁 읽기 완료! +₩300 🐷💡');
 };
 
 document.getElementById('tipIconBtn').onclick = () => {
@@ -259,14 +270,31 @@ function showAllGoalsCelebration(){
   if(!state.dailyData.goals.length||!state.dailyData.goals.every(g=>g.done)) return;
   state.dailyData.goalsCelebrated=true;
   saveDailyData(state.dailyData);
+  // 달성한 목표 리스트 렌더링
+  const listEl = document.getElementById('celebrationGoalList');
+  if(listEl){
+    const goals = state.dailyData.goals.filter(g=>g.done);
+    listEl.innerHTML = goals.map(g=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:linear-gradient(135deg,#fff1f2,#ffe4ec);border-radius:12px">
+        <span style="font-size:1.4rem">${g.icon||'🎯'}</span>
+        <div style="flex:1;text-align:left">
+          <div style="font-size:.9rem;font-weight:700;color:#7b2845">${g.label||''}</div>
+          ${g.reward?`<div style="font-size:.78rem;color:var(--muted);margin-top:1px">+${g.reward.toLocaleString('ko-KR')}원</div>`:''}
+        </div>
+        <span style="font-size:1.1rem">✅</span>
+      </div>
+    `).join('');
+  }
   setTimeout(()=>{
     launchConfetti();
+    pauseCombo();
     document.getElementById('celebrationModal').style.display='flex';
   },700);
 }
 
 document.getElementById('celebrationCloseBtn').onclick=()=>{
   document.getElementById('celebrationModal').style.display='none';
+  resumeCombo();
 };
 
 function showCheckinModal(data){

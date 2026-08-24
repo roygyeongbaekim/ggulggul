@@ -2,11 +2,17 @@
 
 async function doLogin(playerId, playerName, prevLogin=null, isNewPlayer=false){
   state.playerName = playerName;
-  const [fsState, fsDailyData] = await Promise.all([loadPlayerStateFromFs(playerId), loadDailyDataFromFs(playerId)]);
+  state.playerId = playerId; // getDailyKey() 호출 전 먼저 설정 (UUID 기반 키 사용)
+  const [fsState, fsDailyData, fsCheckinDates] = await Promise.all([
+    loadPlayerStateFromFs(playerId),
+    loadDailyDataFromFs(playerId),
+    loadCheckinDatesFromFs(playerId),
+  ]);
   if(fsState) localStorage.setItem(getPlayerStateKey(), JSON.stringify({...fsState, playerId}));
   if(fsDailyData) localStorage.setItem(getDailyKey(), JSON.stringify(fsDailyData));
+  if(fsCheckinDates) state._fsCheckinDates = fsCheckinDates; // initDailySystem에서 병합
   restorePlayerState();
-  state.playerId = playerId;
+  state.playerId = playerId; // restorePlayerState()가 덮어쓸 수 있으므로 재설정
   savePlayerState();
   if(db) db.ref('players/'+safeKey(playerId)).update({name:playerName, playerId, lastLoginAt: TS()}).catch(()=>{});
   fetchAndCacheRanking();
@@ -80,8 +86,8 @@ let _pendingUuid = null;
 })();
 
 // ===== 시작하기 버튼 =====
-$('#startBtn').addEventListener('touchstart', () => { if(playerNameInput) playerNameInput.blur(); }, { passive: true });
 $('#startBtn').onclick = async () => {
+  if(playerNameInput) playerNameInput.blur(); // click 발생 후 blur → 레이아웃 이동 없이 키패드 닫힘
   const name = (playerNameInput?.value||'').trim();
   const result = validatePlayerName(name);
   if(!result.ok){ showNameError(result.msg); playerNameInput.blur(); return; }

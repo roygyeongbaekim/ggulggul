@@ -60,6 +60,21 @@ async function loadDailyDataFromFs(playerId){
   } catch(e){ console.warn('[DB] dailyData 로드 실패:', e); return null; }
 }
 
+async function loadCheckinDatesFromFs(playerId){
+  if(!db) return null;
+  try {
+    const s = await db.ref('playerCheckins/'+safeKey(playerId)).get();
+    return s.exists() ? s.val() : null;
+  } catch(e){ return null; }
+}
+
+async function flushCheckinDatesToFs(dates){
+  if(!db||!state.playerId||!dates||!dates.length) return;
+  try {
+    await db.ref('playerCheckins/'+safeKey(state.playerId)).set(dates);
+  } catch(e){}
+}
+
 async function findOrCreatePlayer(name){
   if(!db) return null;
   try {
