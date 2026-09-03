@@ -1,6 +1,5 @@
 // ===== 데일리 시스템 =====
 
-function getDailyKey(){ return 'ggul-daily-v2-' + (state.playerId || state.playerName); }
 
 function getSecondsUntilMidnight(){ const now=new Date(),m=new Date(now); m.setHours(24,0,0,0); return Math.floor((m-now)/1000); }
 function formatCountdown(s){ return String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor((s%3600)/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
@@ -34,10 +33,18 @@ const rs=document.getElementById('resultScore'); if(rs) rs.textContent=state.sco
 }
 
 function applyRankingSavedState(){
-  const saved = isRankingSavedToday();
-  const banner = document.getElementById('rankAutoSavedBanner');
-  if(banner) banner.style.display = saved ? 'block' : 'none';
+  // 바닥 배너 제거됨 — 팝업은 doSaveRanking에서 직접 표시
 }
+
+function showRankSavedModal(){
+  launchConfetti();
+  const modal = document.getElementById('rankSavedModal');
+  if(modal) modal.style.display = 'flex';
+}
+
+document.getElementById('rankSavedCloseBtn').onclick = () => {
+  document.getElementById('rankSavedModal').style.display = 'none';
+};
 
 function doSaveRanking(){
   const clicksDone = (state.dailyData?.dailyClicks||0) >= DAILY_CLICK_LIMIT;
@@ -46,13 +53,13 @@ function doSaveRanking(){
   if(clicksDone){
     state.rankingSavedDate = getTodayStr();
     if(state.dailyData){ state.dailyData.rankingSaved = true; saveDailyData(state.dailyData); } else { savePlayerState(); }
+    showRankSavedModal();
   }
-  applyRankingSavedState();
 }
 
 
-function loadDailyData(){ try{ return JSON.parse(localStorage.getItem(getDailyKey())||'null'); }catch(e){ return null; } }
-function saveDailyData(d){ localStorage.setItem(getDailyKey(), JSON.stringify(d)); savePlayerState(); flushDailyDataToFs(); flushCheckinDatesToFs(d.checkinDates||[]); }
+function loadDailyData(){ return state.dailyData || null; }
+function saveDailyData(d){ state.dailyData = d; savePlayerState(); flushDailyDataToFs(); flushCheckinDatesToFs(d.checkinDates||[]); }
 
 function generateDailyGoals(dayIndex){
   const n = GOAL_POOL.length;

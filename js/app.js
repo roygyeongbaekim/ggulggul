@@ -2,17 +2,18 @@
 
 async function doLogin(playerId, playerName, prevLogin=null, isNewPlayer=false){
   state.playerName = playerName;
-  state.playerId = playerId; // getDailyKey() 호출 전 먼저 설정 (UUID 기반 키 사용)
+  state.playerId = playerId;
   const [fsState, fsDailyData, fsCheckinDates] = await Promise.all([
     loadPlayerStateFromFs(playerId),
     loadDailyDataFromFs(playerId),
     loadCheckinDatesFromFs(playerId),
   ]);
-  if(fsState) localStorage.setItem(getPlayerStateKey(), JSON.stringify({...fsState, playerId}));
-  if(fsDailyData) localStorage.setItem(getDailyKey(), JSON.stringify(fsDailyData));
-  if(fsCheckinDates) state._fsCheckinDates = fsCheckinDates; // initDailySystem에서 병합
   restorePlayerState();
-  state.playerId = playerId; // restorePlayerState()가 덮어쓸 수 있으므로 재설정
+  applyPlayerStateData(fsState);
+  state.playerId = playerId;
+  // daily 데이터: 오늘 날짜인 경우만 메모리에 적용 (날짜 바뀐 경우 initDailySystem이 새로 생성)
+  state.dailyData = (fsDailyData && fsDailyData.lastDate === getTodayStr()) ? fsDailyData : null;
+  if(fsCheckinDates) state._fsCheckinDates = fsCheckinDates;
   savePlayerState();
   if(db) db.ref('players/'+safeKey(playerId)).update({name:playerName, playerId, lastLoginAt: TS()}).catch(()=>{});
   fetchAndCacheRanking();
@@ -72,12 +73,17 @@ let _pendingUuid = null;
     if(!db){ _showIntro(); return; }
 
     const snap = await db.ref('players/'+safeKey(uuid)).get();
+    console.log('[UUID Login] 조회 결과:', { uuid, key: safeKey(uuid), exists: snap.exists(), val: snap.exists() ? snap.val() : null });
     if(snap.exists() && snap.val().name){
       // 기존 플레이어 → 게임 화면으로 이동
       const playerData = snap.val();
       await doLogin(uuid, playerData.name, playerData.lastLoginAt||null, false);
       _hideLoading();
       return;
+    }
+    if(snap.exists() && !snap.val().name){
+      // 노드는 있지만 이름 미등록 → 이름 입력 화면
+      console.warn('[UUID Login] 노드 존재하나 name 없음:', snap.val());
     }
     // Case 2: uuid가 처음 들어오는 값 → 인트로 화면에서 이름 입력
     _pendingUuid = uuid;
@@ -118,33 +124,22 @@ $('#startBtn').onclick = async () => {
       await doLogin(existingId || generatePlayerId(), name, prevLogin, isNew);
     }
   } catch(e){
-    console.warn('[FS] 로그인 처리 실패, localStorage 폴백:', e);
+    console.warn('[Login] 로그인 처리 실패, 기본값으로 진행:', e);
     restorePlayerState();
-    if(!state.playerId){ state.playerId=generatePlayerId(); savePlayerState(); }
+    if(!state.playerId){ state.playerId=generatePlayerId(); }
+    state.playerName = name || '플레이어';
     initRoundThresholds();
     switchScreen('#gameScreen');
-    const logo=$('#gameScreenLogo'); if(logo) logo.textContent=(name||'플레이어')+'의 저축';
+    const logo=$('#gameScreenLogo'); if(logo) logo.textContent=state.playerName+'의 저축';
     renderRanking(); initDailySystem(); updateUI();
   }
   btn.disabled=false; btn.textContent='시작하기';
 };
 
-window.clearAllGameData = function(target){
-  const t = target || 'all';
+window.clearAllGameData = function(){
+  // 남아있을 수 있는 구버전 localStorage 키 일괄 정리
   const keys = Object.keys(localStorage).filter(k => k.startsWith('ggul-'));
-  if(t === 'ranking'){
-    localStorage.removeItem(rankingKey);
-    console.log('[초기화] 랭킹 데이터 삭제');
-  } else if(t === 'player'){
-    keys.filter(k => k.startsWith('ggul-pstate-')).forEach(k => localStorage.removeItem(k));
-    console.log('[초기화] 플레이어 상태 삭제:', keys.filter(k => k.startsWith('ggul-pstate-')));
-  } else if(t === 'daily'){
-    keys.filter(k => k.startsWith('ggul-daily-')).forEach(k => localStorage.removeItem(k));
-    console.log('[초기화] 일일 데이터 삭제:', keys.filter(k => k.startsWith('ggul-daily-')));
-  } else {
-    keys.forEach(k => localStorage.removeItem(k));
-    console.log('[초기화] 전체 게임 데이터 삭제:', keys);
-  }
+  keys.forEach(k => localStorage.removeItem(k));
   console.log('[초기화] 완료. 페이지를 새로고침하면 반영됩니다.');
 };
 

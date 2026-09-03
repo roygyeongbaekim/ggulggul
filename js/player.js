@@ -14,19 +14,7 @@ function generatePlayerId(){
   return id;
 }
 
-function getPlayerStateKey(){ return 'ggul-pstate-' + state.playerName; }
-
 function savePlayerState(){
-  const ps = {
-    money: state.money, clickIncome: state.clickIncome, tapCount: state.tapCount,
-    upgradeCount: state.upgradeCount, score: state.score, bestCombo: state.bestCombo,
-    currentRound: state.currentRound, completedRounds: state.completedRounds,
-    usedQuizIndices: state.usedQuizIndices,
-    rankingSavedDate: state.rankingSavedDate || null,
-    playerId: state.playerId || null,
-    upgrades: state.upgrades.map(u => ({ id: u.id, cost: u.cost, bought: u.bought }))
-  };
-  localStorage.setItem(getPlayerStateKey(), JSON.stringify(ps));
   scheduleFsSave();
 }
 
@@ -43,22 +31,21 @@ function restorePlayerState(){
   state.completedRounds = { easy:false, normal:false, hard:false };
   state.usedQuizIndices = { easy:[], normal:[], hard:[] };
   state.rankingSavedDate = null; state.playerId = null;
-  try {
-    const ps = JSON.parse(localStorage.getItem(getPlayerStateKey()) || 'null');
-    if(!ps) return;
-    state.money = ps.money || 0;
-    state.clickIncome = ps.clickIncome || 10;
-    state.tapCount = ps.tapCount || 0;
-    state.upgradeCount = ps.upgradeCount || 0;
-    state.score = ps.score || 0;
-    state.bestCombo = ps.bestCombo || 0;
-    state.currentRound = ps.currentRound || 'easy';
-    state.completedRounds = ps.completedRounds || { easy:false, normal:false, hard:false };
-    state.usedQuizIndices = ps.usedQuizIndices || { easy:[], normal:[], hard:[] };
-    state.rankingSavedDate = ps.rankingSavedDate || null;
-    state.playerId = ps.playerId || null;
-    if(ps.upgrades){ ps.upgrades.forEach(saved => { const u = state.upgrades.find(x => x.id === saved.id); if(u){ u.cost = saved.cost; u.bought = saved.bought; } }); }
-  } catch(e) {}
+}
+
+function applyPlayerStateData(ps){
+  if(!ps) return;
+  state.money = ps.money || 0;
+  state.clickIncome = ps.clickIncome || 10;
+  state.tapCount = ps.tapCount || 0;
+  state.upgradeCount = ps.upgradeCount || 0;
+  state.score = ps.score || 0;
+  state.bestCombo = ps.bestCombo || 0;
+  state.currentRound = ps.currentRound || 'easy';
+  state.completedRounds = ps.completedRounds || { easy:false, normal:false, hard:false };
+  state.usedQuizIndices = ps.usedQuizIndices || { easy:[], normal:[], hard:[] };
+  state.rankingSavedDate = ps.rankingSavedDate || null;
+  if(ps.upgrades){ ps.upgrades.forEach(saved => { const u = state.upgrades.find(x => x.id === saved.id); if(u){ u.cost = saved.cost; u.bought = saved.bought; } }); }
 }
 
 function isRankingSavedToday(){

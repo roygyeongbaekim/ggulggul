@@ -69,7 +69,14 @@ function showEventModal(quiz, roundKey){
   }, 1700);
 }
 
-function closeEventModal(){ resumeCombo(); $('#eventModal').style.display='none'; const wm=$('#quizWrongMsg'); if(wm) wm.remove(); const cb=$('#eventModalClose'); if(cb) cb.textContent='닫기'; }
+function closeEventModal(){
+  // 축하 모달이 열려있으면 콤보 타이머를 재개하지 않음 (축하 모달 닫을 때 resumeCombo 처리)
+  const celebOpen = document.getElementById('celebrationModal')?.style.display === 'flex';
+  if(!celebOpen) resumeCombo();
+  $('#eventModal').style.display='none';
+  const wm=$('#quizWrongMsg'); if(wm) wm.remove();
+  const cb=$('#eventModalClose'); if(cb) cb.textContent='닫기';
+}
 
 $('#eventModalClose').onclick=()=>{
   const isAnswered = !!$('#quizWrongMsg');

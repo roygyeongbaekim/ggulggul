@@ -70,9 +70,7 @@ async function saveRankingToFs(entry){
   } catch(e){ console.warn('[DB] 랭킹 저장 실패:', e); showToast('꿀꿀... 저장에 실패했어요. 잠시 후 다시 시도해주세요 🐷'); }
 }
 
-const rankingKey = 'ggul-saving-ranking-v1';
-function loadRanking(){ if(_rankingCache.length) return _rankingCache; try { return JSON.parse(localStorage.getItem(rankingKey) || '[]'); } catch(e){ return []; } }
-function saveRanking(list){ localStorage.setItem(rankingKey, JSON.stringify(list)); }
+function saveRanking(list){ _rankingCache = list; }
 function upsertRanking(){ const entry = { name: (state.playerName || '플레이어').trim() || '플레이어', score: state.score, money: state.money, savedAt: new Date().toISOString() }; saveRankingToFs(entry); showToast('꿀꿀~ 랭킹에 저장했어요! 🐷'); }
 
 let _activeRankTab = 'daily';

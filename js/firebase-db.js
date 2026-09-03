@@ -105,9 +105,3 @@ async function checkNameTaken(name, excludeUuid){
   } catch(e){ console.warn('[DB] 이름 중복 확인 실패:', e); return false; }
 }
 
-function peekPlayerId(){
-  try {
-    const ps = JSON.parse(localStorage.getItem('ggul-pstate-'+state.playerName)||'null');
-    return ps?.playerId || null;
-  } catch(e){ return null; }
-}
