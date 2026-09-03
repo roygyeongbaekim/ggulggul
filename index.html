@@ -112,10 +112,6 @@
                   <strong id="resultScore" style="font-size:.82rem;color:#7b2845">0</strong>
                 </div>
               </div>
-              <div id="rankAutoSavedBanner" style="display:none;padding:10px 12px;background:rgba(255,255,255,.85);border-radius:14px;border:1.5px solid rgba(76,143,90,.3)">
-                <div style="font-size:2rem;line-height:1;display:inline-block;animation:pigBounce 1s ease-in-out infinite">🐷</div>
-                <div style="font-size:.82rem;font-weight:900;color:#2e7d32;margin-top:4px">꿀꿀~ 랭킹에 저장됐어요! 🏆</div>
-              </div>
             </div>
           </div>
           <section class="quick"><div class="quick-header" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>⚡ 빠른 업그레이드</span><div style="display:flex;align-items:center;gap:6px"><button id="coachRestartBtn" title="게임 가이드 보기" style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#f0f4ff,#dce8ff);border:1.5px solid rgba(99,130,235,.35);font-size:.8rem;display:grid;place-items:center;box-shadow:0 1px 4px rgba(99,130,235,.18);padding:0;cursor:pointer;font-weight:900;color:#4a6fd4">?▶</button><button id="checkinCalBtn" title="출석 현황" style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#fff0f6,#ffd6e8);border:1.5px solid rgba(235,120,155,.35);font-size:.85rem;display:grid;place-items:center;box-shadow:0 1px 4px rgba(235,120,155,.18);padding:0;cursor:pointer">📅</button><div class="logo" id="gameScreenLogo" style="font-size:.85rem;font-weight:800;white-space:nowrap"></div></div></div><div class="up-list" id="quickUpgradeList"></div></section>
@@ -195,6 +191,16 @@
 
   <!-- 컨페티 오버레이 -->
   <div id="confettiOverlay" style="display:none;position:fixed;inset:0;pointer-events:none;z-index:2000;overflow:hidden"></div>
+
+  <!-- 랭킹 저장 완료 팝업 -->
+  <div class="modalbg" id="rankSavedModal" style="z-index:2050">
+    <div class="modal" style="max-width:300px;text-align:center;gap:10px;padding:28px 20px">
+      <div style="font-size:4rem;line-height:1;animation:pigBounce 0.7s ease-in-out infinite">🐷</div>
+      <div style="font-size:1.35rem;font-weight:900;color:#2e7d32">랭킹에 저장됐어요!</div>
+      <div style="font-size:.88rem;color:var(--muted)">오늘의 기록이 등록됐어요 🏆</div>
+      <button class="start-btn" id="rankSavedCloseBtn" style="min-height:44px;padding:0 24px;margin-top:4px">확인 🐷</button>
+    </div>
+  </div>
 
   <!-- 목표 달성 축하 모달 -->
   <div class="modalbg" id="celebrationModal" style="z-index:2100">
@@ -307,14 +313,14 @@
   </script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-  <script src="js/data.js?v=20260708090000"></script>
-  <script src="js/state.js?v=20260530000000"></script>
-  <script src="js/firebase-db.js?v=20260530000000"></script>
-  <script src="js/ranking.js?v=20260708140000"></script>
-  <script src="js/player.js?v=20260530000000"></script>
-  <script src="js/daily.js?v=20260708110000"></script>
-  <script src="js/game.js?v=20260708130000"></script>
-  <script src="js/ui.js?v=20260708140000"></script>
-  <script src="js/app.js?v=20260708140000"></script>
+  <script src="js/data.js?v=20260903000000"></script>
+  <script src="js/state.js?v=20260903000000"></script>
+  <script src="js/firebase-db.js?v=20260903000000"></script>
+  <script src="js/player.js?v=20260903000000"></script>
+  <script src="js/ranking.js?v=20260903000000"></script>
+  <script src="js/daily.js?v=20260903000000"></script>
+  <script src="js/game.js?v=20260903000000"></script>
+  <script src="js/ui.js?v=20260903000000"></script>
+  <script src="js/app.js?v=20260903000000"></script>
 </body>
 </html>
